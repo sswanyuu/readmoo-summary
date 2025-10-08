@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Readmoo Summary</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1>📚 Readmoo Summary</h1>
+      <div class="status-indicator" id="statusIndicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Active</span>
+      </div>
+    </header>
+    
+    <main class="popup-main">
+      <div class="action-section">
+        <button id="summarizeBtn" class="primary-btn">
+          <span class="btn-icon">📝</span>
+          Summarize Current Page
+        </button>
+        
+        <button id="toggleBtn" class="secondary-btn">
+          <span class="btn-icon">⚙️</span>
+          Toggle Extension
+        </button>
+      </div>
+      
+      <div class="settings-section">
+        <div class="setting-item">
+          <label for="autoSummary">Auto-summarize</label>
+          <input type="checkbox" id="autoSummary" class="toggle-switch">
+        </div>
+        
+        <div class="setting-item">
+          <label for="summaryLength">Summary Length</label>
+          <select id="summaryLength" class="select-input">
+            <option value="short">Short</option>
+            <option value="medium" selected>Medium</option>
+            <option value="long">Long</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="summary-section" id="summarySection" style="display: none;">
+        <h3>Summary</h3>
+        <div class="summary-content" id="summaryContent"></div>
+        <div class="summary-actions">
+          <button id="copySummary" class="action-btn">📋 Copy</button>
+          <button id="saveSummary" class="action-btn">💾 Save</button>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="popup-footer">
+      <button id="optionsBtn" class="link-btn">⚙️ Options</button>
+      <button id="helpBtn" class="link-btn">❓ Help</button>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
