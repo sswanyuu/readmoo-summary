@@ -14,23 +14,61 @@ A Chrome Extension v3 that provides intelligent content summarization for Readmo
 
 ## Installation
 
+### Prerequisites
+
+- Node.js 16+ and npm 8+
+- Chrome browser (version 88+)
+
 ### Development Setup
 
-1. **Clone or download this repository**
+1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd readmoo-summary
+   cd readmoo-summary-extension
    ```
 
-2. **Load the extension in Chrome**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Build the extension**
+   ```bash
+   npm run build
+   ```
+
+4. **Load the extension in Chrome**
    - Open Chrome and navigate to `chrome://extensions/`
    - Enable "Developer mode" in the top right corner
-   - Click "Load unpacked" and select the project folder
+   - Click "Load unpacked" and select the `dist/` folder (⚠️ NOT the root folder)
    - The extension should now appear in your extensions list
 
-3. **Pin the extension** (optional)
-   - Click the puzzle piece icon in Chrome's toolbar
-   - Find "Readmoo Summary" and click the pin icon
+5. **Test the extension**
+   - Click the extension icon in Chrome's toolbar
+   - Navigate to a Readmoo page and test functionality
+   - See [TESTING.md](TESTING.md) for detailed testing instructions
+
+### Development Workflow
+
+```bash
+# Install dependencies
+npm install
+
+# Development build with watch mode
+npm run dev
+
+# Production build
+npm run build
+
+# Run tests
+npm test
+
+# Run linter
+npm run lint
+
+# Package for distribution
+npm run package
+```
 
 ### Production Installation
 
@@ -56,18 +94,27 @@ For end users, the extension can be installed from the Chrome Web Store (when pu
 ## File Structure
 
 ```
-readmoo-summary/
-├── manifest.json          # Extension manifest (v3)
-├── background.js          # Service worker script
-├── popup.html            # Extension popup interface
-├── popup.css             # Popup styles
-├── popup.js              # Popup functionality
-├── content.js            # Content script for page interaction
-├── content.css           # Content script styles
-├── options.html          # Options/settings page
-├── options.css           # Options page styles
-├── options.js            # Options page functionality
-├── icons/                # Extension icons (16px, 32px, 48px, 128px)
+readmoo-summary-extension/
+├── src/                   # Source files
+│   ├── manifest.json      # Extension manifest (v3)
+│   ├── background.js      # Service worker script
+│   ├── popup.html         # Extension popup interface
+│   ├── popup.css          # Popup styles
+│   ├── popup.js           # Popup functionality
+│   ├── content.js         # Content script for page interaction
+│   ├── content.css        # Content script styles
+│   ├── options.html       # Options/settings page
+│   ├── options.css        # Options page styles
+│   ├── options.js         # Options page functionality
+│   └── icons/             # Extension icons (16px, 32px, 48px, 128px)
+├── dist/                  # Built extension (generated)
+├── tests/                 # Test files
+├── .github/              # GitHub Actions workflows
+├── package.json          # NPM package configuration
+├── webpack.config.js     # Webpack build configuration
+├── .eslintrc.js          # ESLint configuration
+├── .babelrc              # Babel configuration
+├── .gitignore            # Git ignore rules
 └── README.md             # This file
 ```
 
@@ -105,16 +152,45 @@ Example API response:
 
 ### Prerequisites
 
+- Node.js 16+ and npm 8+
 - Chrome browser (version 88+)
 - Basic knowledge of JavaScript, HTML, and CSS
 - Chrome Extension development experience (helpful but not required)
 
 ### Building and Testing
 
-1. **Make changes** to the source files
-2. **Reload the extension** in `chrome://extensions/`
-3. **Test functionality** on Readmoo pages
-4. **Check console** for any errors or debug information
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Start development mode**
+   ```bash
+   npm run dev
+   ```
+   This will build the extension and watch for changes.
+
+3. **Make changes** to the source files in the `src/` directory
+4. **Reload the extension** in `chrome://extensions/` (the build will auto-reload)
+5. **Test functionality** on Readmoo pages
+6. **Run tests**
+   ```bash
+   npm test
+   ```
+7. **Check console** for any errors or debug information
+
+### Available Scripts
+
+- `npm run build` - Production build
+- `npm run build:dev` - Development build
+- `npm run watch` - Watch mode for development
+- `npm run dev` - Development build with watch
+- `npm run clean` - Clean build directory
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+- `npm test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run package` - Package extension for distribution
 
 ### Debugging
 
