@@ -6,10 +6,11 @@
   "permissions": [
     "activeTab",
     "storage",
-    "scripting"
+    "scripting",
+    "webRequest"
   ],
   "host_permissions": [
-    "https://readmoo.com/*"
+    "https://readmoo.com/*", "*://reader.readmoo.com/*"
   ],
   "background": {
     "service_worker": "background.js"

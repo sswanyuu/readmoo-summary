@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 // Handle messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Background received message:', request)
+  console.log('Background received message 123:', request)
 
   switch (request.action) {
     case 'getSettings':
@@ -77,3 +77,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     })
   }
 })
+chrome.webRequest.onCompleted.addListener(
+  (details) => {
+    if(details.documentId) {
+      // This is the request with page content.
+      // TODO: Get summary and display in the popup
+      // chrome.tabs.sendMessage(details.tabId, { action: 'documentId', documentId: details.documentId })
+    }
+    console.log("Request finished:", details.url, "status:", details.statusCode, details);
+  },
+  { urls: ["*://reader.readmoo.com/e/*"] }
+);
+
