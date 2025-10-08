@@ -3,64 +3,64 @@
 
 // Extension installation/startup
 chrome.runtime.onInstalled.addListener((details) => {
-  console.log('Extension installed/updated:', details);
-  
+  console.log('Extension installed/updated:', details)
+
   // Set default settings
   chrome.storage.sync.set({
     enabled: true,
     autoSummary: false,
     summaryLength: 'medium'
-  });
-});
+  })
+})
 
 // Handle messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Background received message:', request);
-  
+  console.log('Background received message:', request)
+
   switch (request.action) {
     case 'getSettings':
       chrome.storage.sync.get(['enabled', 'autoSummary', 'summaryLength'], (result) => {
-        sendResponse(result);
-      });
-      return true; // Keep message channel open for async response
-      
+        sendResponse(result)
+      })
+      return true // Keep message channel open for async response
+
     case 'updateSettings':
       chrome.storage.sync.set(request.settings, () => {
-        sendResponse({ success: true });
-      });
-      return true;
-      
+        sendResponse({ success: true })
+      })
+      return true
+
     case 'summarizeContent':
       // Handle content summarization
-      handleSummarization(request.content, sendResponse);
-      return true;
-      
+      handleSummarization(request.content, sendResponse)
+      return true
+
     default:
-      sendResponse({ error: 'Unknown action' });
+      sendResponse({ error: 'Unknown action' })
   }
-});
+})
 
 // Handle summarization logic
-async function handleSummarization(content, sendResponse) {
+async function handleSummarization (content, sendResponse) {
   try {
     // This is where you would integrate with your summarization service
     // For now, we'll simulate a summary
-    const summary = await simulateSummarization(content);
-    sendResponse({ success: true, summary });
+    const summary = await simulateSummarization(content)
+    sendResponse({ success: true, summary })
   } catch (error) {
-    console.error('Summarization error:', error);
-    sendResponse({ success: false, error: error.message });
+    console.error('Summarization error:', error)
+    sendResponse({ success: false, error: error.message })
   }
 }
 
 // Simulate summarization (replace with actual API call)
-async function simulateSummarization(content) {
+async function simulateSummarization (content) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const words = content.split(' ').length;
-      resolve(`This is a simulated summary of ${words} words. The original content has been processed and condensed into key points.`);
-    }, 1000);
-  });
+      const words = content.split(' ').length
+      resolve(`This is a simulated summary of ${words} words. The original content has been processed and condensed into key points.`)
+    }, 1000)
+  })
 }
 
 // Handle tab updates to inject content scripts when needed
@@ -70,10 +70,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     chrome.storage.sync.get(['enabled'], (result) => {
       if (result.enabled) {
         chrome.scripting.executeScript({
-          target: { tabId: tabId },
+          target: { tabId },
           files: ['content.js']
-        }).catch(err => console.log('Script injection failed:', err));
+        }).catch(err => console.log('Script injection failed:', err))
       }
-    });
+    })
   }
-});
+})

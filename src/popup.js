@@ -1,103 +1,103 @@
 // Popup script for Chrome Extension
 document.addEventListener('DOMContentLoaded', async () => {
   // Get DOM elements
-  const summarizeBtn = document.getElementById('summarizeBtn');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const autoSummaryToggle = document.getElementById('autoSummary');
-  const summaryLengthSelect = document.getElementById('summaryLength');
-  const summarySection = document.getElementById('summarySection');
-  const summaryContent = document.getElementById('summaryContent');
-  const copySummaryBtn = document.getElementById('copySummary');
-  const saveSummaryBtn = document.getElementById('saveSummary');
-  const optionsBtn = document.getElementById('optionsBtn');
-  const helpBtn = document.getElementById('helpBtn');
-  const statusIndicator = document.getElementById('statusIndicator');
+  const summarizeBtn = document.getElementById('summarizeBtn')
+  const toggleBtn = document.getElementById('toggleBtn')
+  const autoSummaryToggle = document.getElementById('autoSummary')
+  const summaryLengthSelect = document.getElementById('summaryLength')
+  const summarySection = document.getElementById('summarySection')
+  const summaryContent = document.getElementById('summaryContent')
+  const copySummaryBtn = document.getElementById('copySummary')
+  const saveSummaryBtn = document.getElementById('saveSummary')
+  const optionsBtn = document.getElementById('optionsBtn')
+  const helpBtn = document.getElementById('helpBtn')
+  const statusIndicator = document.getElementById('statusIndicator')
 
   // Load settings on popup open
-  await loadSettings();
+  await loadSettings()
 
   // Event listeners
-  summarizeBtn.addEventListener('click', handleSummarize);
-  toggleBtn.addEventListener('click', handleToggle);
-  autoSummaryToggle.addEventListener('change', handleAutoSummaryChange);
-  summaryLengthSelect.addEventListener('change', handleSummaryLengthChange);
-  copySummaryBtn.addEventListener('click', handleCopySummary);
-  saveSummaryBtn.addEventListener('click', handleSaveSummary);
-  optionsBtn.addEventListener('click', openOptions);
-  helpBtn.addEventListener('click', openHelp);
+  summarizeBtn.addEventListener('click', handleSummarize)
+  toggleBtn.addEventListener('click', handleToggle)
+  autoSummaryToggle.addEventListener('change', handleAutoSummaryChange)
+  summaryLengthSelect.addEventListener('change', handleSummaryLengthChange)
+  copySummaryBtn.addEventListener('click', handleCopySummary)
+  saveSummaryBtn.addEventListener('click', handleSaveSummary)
+  optionsBtn.addEventListener('click', openOptions)
+  helpBtn.addEventListener('click', openHelp)
 
   // Load settings from storage
-  async function loadSettings() {
+  async function loadSettings () {
     try {
-      const response = await chrome.runtime.sendMessage({ action: 'getSettings' });
+      const response = await chrome.runtime.sendMessage({ action: 'getSettings' })
       if (response) {
-        autoSummaryToggle.checked = response.autoSummary || false;
-        summaryLengthSelect.value = response.summaryLength || 'medium';
-        updateStatusIndicator(response.enabled);
+        autoSummaryToggle.checked = response.autoSummary || false
+        summaryLengthSelect.value = response.summaryLength || 'medium'
+        updateStatusIndicator(response.enabled)
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error('Failed to load settings:', error)
     }
   }
 
   // Handle summarize button click
-  async function handleSummarize() {
+  async function handleSummarize () {
     try {
-      setLoading(true);
-      
+      setLoading(true)
+
       // Get current tab
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
       if (!tab.url.includes('readmoo.com')) {
-        showNotification('Please navigate to a Readmoo page first', 'error');
-        return;
+        showNotification('Please navigate to a Readmoo page first', 'error')
+        return
       }
 
       // Get page content
-      const content = await getPageContent(tab.id);
-      
+      const content = await getPageContent(tab.id)
+
       if (!content) {
-        showNotification('No content found to summarize', 'error');
-        return;
+        showNotification('No content found to summarize', 'error')
+        return
       }
 
       // Send content for summarization
       const response = await chrome.runtime.sendMessage({
         action: 'summarizeContent',
-        content: content
-      });
+        content
+      })
 
       if (response.success) {
-        showSummary(response.summary);
-        showNotification('Summary generated successfully!', 'success');
+        showSummary(response.summary)
+        showNotification('Summary generated successfully!', 'success')
       } else {
-        showNotification('Failed to generate summary: ' + response.error, 'error');
+        showNotification(`Failed to generate summary: ${response.error}`, 'error')
       }
     } catch (error) {
-      console.error('Summarization error:', error);
-      showNotification('An error occurred while summarizing', 'error');
+      console.error('Summarization error:', error)
+      showNotification('An error occurred while summarizing', 'error')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   // Get page content from current tab
-  async function getPageContent(tabId) {
+  async function getPageContent (tabId) {
     try {
       const results = await chrome.scripting.executeScript({
-        target: { tabId: tabId },
+        target: { tabId },
         function: extractPageContent
-      });
-      
-      return results[0]?.result || null;
+      })
+
+      return results[0]?.result || null
     } catch (error) {
-      console.error('Failed to extract content:', error);
-      return null;
+      console.error('Failed to extract content:', error)
+      return null
     }
   }
 
   // Function to extract content (runs in page context)
-  function extractPageContent() {
+  function extractPageContent () {
     // Try to find main content areas
     const selectors = [
       'article',
@@ -107,147 +107,147 @@ document.addEventListener('DOMContentLoaded', async () => {
       '.chapter-content',
       'main',
       '.post-content'
-    ];
-    
+    ]
+
     for (const selector of selectors) {
-      const element = document.querySelector(selector);
+      const element = document.querySelector(selector)
       if (element && element.textContent.trim().length > 100) {
-        return element.textContent.trim();
+        return element.textContent.trim()
       }
     }
-    
+
     // Fallback to body content
-    return document.body.textContent.trim();
+    return document.body.textContent.trim()
   }
 
   // Handle toggle button
-  async function handleToggle() {
+  async function handleToggle () {
     try {
-      const currentSettings = await chrome.runtime.sendMessage({ action: 'getSettings' });
-      const newEnabled = !currentSettings.enabled;
-      
+      const currentSettings = await chrome.runtime.sendMessage({ action: 'getSettings' })
+      const newEnabled = !currentSettings.enabled
+
       await chrome.runtime.sendMessage({
         action: 'updateSettings',
         settings: { enabled: newEnabled }
-      });
-      
-      updateStatusIndicator(newEnabled);
+      })
+
+      updateStatusIndicator(newEnabled)
       showNotification(
         newEnabled ? 'Extension enabled' : 'Extension disabled',
         'success'
-      );
+      )
     } catch (error) {
-      console.error('Toggle error:', error);
-      showNotification('Failed to toggle extension', 'error');
+      console.error('Toggle error:', error)
+      showNotification('Failed to toggle extension', 'error')
     }
   }
 
   // Handle auto-summary toggle
-  async function handleAutoSummaryChange() {
+  async function handleAutoSummaryChange () {
     try {
       await chrome.runtime.sendMessage({
         action: 'updateSettings',
         settings: { autoSummary: autoSummaryToggle.checked }
-      });
+      })
     } catch (error) {
-      console.error('Auto-summary toggle error:', error);
+      console.error('Auto-summary toggle error:', error)
     }
   }
 
   // Handle summary length change
-  async function handleSummaryLengthChange() {
+  async function handleSummaryLengthChange () {
     try {
       await chrome.runtime.sendMessage({
         action: 'updateSettings',
         settings: { summaryLength: summaryLengthSelect.value }
-      });
+      })
     } catch (error) {
-      console.error('Summary length change error:', error);
+      console.error('Summary length change error:', error)
     }
   }
 
   // Show summary in popup
-  function showSummary(summary) {
-    summaryContent.textContent = summary;
-    summarySection.style.display = 'block';
+  function showSummary (summary) {
+    summaryContent.textContent = summary
+    summarySection.style.display = 'block'
   }
 
   // Handle copy summary
-  async function handleCopySummary() {
+  async function handleCopySummary () {
     try {
-      await navigator.clipboard.writeText(summaryContent.textContent);
-      showNotification('Summary copied to clipboard!', 'success');
+      await navigator.clipboard.writeText(summaryContent.textContent)
+      showNotification('Summary copied to clipboard!', 'success')
     } catch (error) {
-      console.error('Copy error:', error);
-      showNotification('Failed to copy summary', 'error');
+      console.error('Copy error:', error)
+      showNotification('Failed to copy summary', 'error')
     }
   }
 
   // Handle save summary
-  async function handleSaveSummary() {
+  async function handleSaveSummary () {
     try {
-      const summary = summaryContent.textContent;
-      const timestamp = new Date().toISOString();
-      
+      const summary = summaryContent.textContent
+      const timestamp = new Date().toISOString()
+
       // Save to storage
-      const savedSummaries = await chrome.storage.local.get(['summaries']) || { summaries: [] };
-      savedSummaries.summaries = savedSummaries.summaries || [];
+      const savedSummaries = await chrome.storage.local.get(['summaries']) || { summaries: [] }
+      savedSummaries.summaries = savedSummaries.summaries || []
       savedSummaries.summaries.push({
         content: summary,
-        timestamp: timestamp,
+        timestamp,
         url: (await chrome.tabs.query({ active: true, currentWindow: true }))[0].url
-      });
-      
-      await chrome.storage.local.set({ summaries: savedSummaries.summaries });
-      showNotification('Summary saved!', 'success');
+      })
+
+      await chrome.storage.local.set({ summaries: savedSummaries.summaries })
+      showNotification('Summary saved!', 'success')
     } catch (error) {
-      console.error('Save error:', error);
-      showNotification('Failed to save summary', 'error');
+      console.error('Save error:', error)
+      showNotification('Failed to save summary', 'error')
     }
   }
 
   // Open options page
-  function openOptions() {
-    chrome.runtime.openOptionsPage();
+  function openOptions () {
+    chrome.runtime.openOptionsPage()
   }
 
   // Open help
-  function openHelp() {
-    chrome.tabs.create({ url: 'https://github.com/your-repo/readmoo-summary' });
+  function openHelp () {
+    chrome.tabs.create({ url: 'https://github.com/your-repo/readmoo-summary' })
   }
 
   // Update status indicator
-  function updateStatusIndicator(enabled) {
-    const statusDot = statusIndicator.querySelector('.status-dot');
-    const statusText = statusIndicator.querySelector('.status-text');
-    
+  function updateStatusIndicator (enabled) {
+    const statusDot = statusIndicator.querySelector('.status-dot')
+    const statusText = statusIndicator.querySelector('.status-text')
+
     if (enabled) {
-      statusDot.style.background = '#4ade80';
-      statusText.textContent = 'Active';
+      statusDot.style.background = '#4ade80'
+      statusText.textContent = 'Active'
     } else {
-      statusDot.style.background = '#ef4444';
-      statusText.textContent = 'Inactive';
+      statusDot.style.background = '#ef4444'
+      statusText.textContent = 'Inactive'
     }
   }
 
   // Set loading state
-  function setLoading(loading) {
-    const container = document.querySelector('.popup-container');
+  function setLoading (loading) {
+    const container = document.querySelector('.popup-container')
     if (loading) {
-      container.classList.add('loading');
-      summarizeBtn.textContent = 'Summarizing...';
+      container.classList.add('loading')
+      summarizeBtn.textContent = 'Summarizing...'
     } else {
-      container.classList.remove('loading');
-      summarizeBtn.innerHTML = '<span class="btn-icon">📝</span>Summarize Current Page';
+      container.classList.remove('loading')
+      summarizeBtn.innerHTML = '<span class="btn-icon">📝</span>Summarize Current Page'
     }
   }
 
   // Show notification
-  function showNotification(message, type = 'info') {
+  function showNotification (message, type = 'info') {
     // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
+    const notification = document.createElement('div')
+    notification.className = `notification notification-${type}`
+    notification.textContent = message
     notification.style.cssText = `
       position: fixed;
       top: 10px;
@@ -259,13 +259,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       font-size: 12px;
       z-index: 1000;
       animation: slideIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(notification);
-    
+    `
+
+    document.body.appendChild(notification)
+
     // Remove after 3 seconds
     setTimeout(() => {
-      notification.remove();
-    }, 3000);
+      notification.remove()
+    }, 3000)
   }
-});
+})

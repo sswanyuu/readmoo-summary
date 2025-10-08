@@ -1,31 +1,31 @@
 // Content script for Chrome Extension
 // This script runs in the context of web pages to interact with page content
 
-console.log('Readmoo Summary content script loaded');
+console.log('Readmoo Summary content script loaded')
 
 // Initialize content script
-function initContentScript() {
+function initContentScript () {
   // Check if we're on a Readmoo page
   if (!window.location.hostname.includes('readmoo.com')) {
-    return;
+    return
   }
 
   // Add extension indicator to the page
-  addExtensionIndicator();
-  
+  addExtensionIndicator()
+
   // Listen for messages from popup/background
-  chrome.runtime.onMessage.addListener(handleMessage);
-  
+  chrome.runtime.onMessage.addListener(handleMessage)
+
   // Auto-summarize if enabled
-  checkAutoSummarize();
+  checkAutoSummarize()
 }
 
 // Add visual indicator that extension is active
-function addExtensionIndicator() {
+function addExtensionIndicator () {
   // Create floating indicator
-  const indicator = document.createElement('div');
-  indicator.id = 'readmoo-summary-indicator';
-  indicator.innerHTML = '📚';
+  const indicator = document.createElement('div')
+  indicator.id = 'readmoo-summary-indicator'
+  indicator.innerHTML = '📚'
   indicator.style.cssText = `
     position: fixed;
     top: 20px;
@@ -43,50 +43,50 @@ function addExtensionIndicator() {
     z-index: 10000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease;
-  `;
-  
+  `
+
   indicator.addEventListener('mouseenter', () => {
-    indicator.style.transform = 'scale(1.1)';
-  });
-  
+    indicator.style.transform = 'scale(1.1)'
+  })
+
   indicator.addEventListener('mouseleave', () => {
-    indicator.style.transform = 'scale(1)';
-  });
-  
+    indicator.style.transform = 'scale(1)'
+  })
+
   indicator.addEventListener('click', () => {
-    showSummaryPanel();
-  });
-  
-  document.body.appendChild(indicator);
+    showSummaryPanel()
+  })
+
+  document.body.appendChild(indicator)
 }
 
 // Handle messages from extension
-function handleMessage(request, sender, sendResponse) {
-  console.log('Content script received message:', request);
-  
+function handleMessage (request, sender, sendResponse) {
+  console.log('Content script received message:', request)
+
   switch (request.action) {
     case 'getPageContent':
-      const content = extractPageContent();
-      sendResponse({ content: content });
-      break;
-      
+      const content = extractPageContent()
+      sendResponse({ content })
+      break
+
     case 'highlightContent':
-      highlightContent(request.selector);
-      sendResponse({ success: true });
-      break;
-      
+      highlightContent(request.selector)
+      sendResponse({ success: true })
+      break
+
     case 'showSummary':
-      showSummaryPanel(request.summary);
-      sendResponse({ success: true });
-      break;
-      
+      showSummaryPanel(request.summary)
+      sendResponse({ success: true })
+      break
+
     default:
-      sendResponse({ error: 'Unknown action' });
+      sendResponse({ error: 'Unknown action' })
   }
 }
 
 // Extract main content from the page
-function extractPageContent() {
+function extractPageContent () {
   const selectors = [
     'article',
     '.content',
@@ -97,51 +97,51 @@ function extractPageContent() {
     'main',
     '.entry-content',
     '.article-content'
-  ];
-  
+  ]
+
   for (const selector of selectors) {
-    const element = document.querySelector(selector);
+    const element = document.querySelector(selector)
     if (element && element.textContent.trim().length > 100) {
       return {
         text: element.textContent.trim(),
         html: element.innerHTML,
-        selector: selector
-      };
+        selector
+      }
     }
   }
-  
+
   // Fallback to body content
   return {
     text: document.body.textContent.trim(),
     html: document.body.innerHTML,
     selector: 'body'
-  };
+  }
 }
 
 // Highlight specific content on the page
-function highlightContent(selector) {
-  const element = document.querySelector(selector);
+function highlightContent (selector) {
+  const element = document.querySelector(selector)
   if (element) {
     element.style.cssText += `
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
       border: 2px solid #667eea;
       border-radius: 4px;
       padding: 8px;
-    `;
+    `
   }
 }
 
 // Show summary panel
-function showSummaryPanel(summary = null) {
+function showSummaryPanel (summary = null) {
   // Remove existing panel if any
-  const existingPanel = document.getElementById('readmoo-summary-panel');
+  const existingPanel = document.getElementById('readmoo-summary-panel')
   if (existingPanel) {
-    existingPanel.remove();
+    existingPanel.remove()
   }
-  
+
   // Create summary panel
-  const panel = document.createElement('div');
-  panel.id = 'readmoo-summary-panel';
+  const panel = document.createElement('div')
+  panel.id = 'readmoo-summary-panel'
   panel.style.cssText = `
     position: fixed;
     top: 50%;
@@ -156,8 +156,8 @@ function showSummaryPanel(summary = null) {
     z-index: 10001;
     overflow: hidden;
     animation: slideIn 0.3s ease;
-  `;
-  
+  `
+
   panel.innerHTML = `
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center;">
       <h2 style="margin: 0; font-size: 20px;">📚 Content Summary</h2>
@@ -175,10 +175,10 @@ function showSummaryPanel(summary = null) {
         </button>
       </div>
     </div>
-  `;
-  
+  `
+
   // Add CSS animation
-  const style = document.createElement('style');
+  const style = document.createElement('style')
   style.textContent = `
     @keyframes slideIn {
       from {
@@ -190,79 +190,79 @@ function showSummaryPanel(summary = null) {
         transform: translate(-50%, -50%) scale(1);
       }
     }
-  `;
-  document.head.appendChild(style);
-  
-  document.body.appendChild(panel);
-  
+  `
+  document.head.appendChild(style)
+
+  document.body.appendChild(panel)
+
   // Add event listeners
   document.getElementById('copy-summary').addEventListener('click', () => {
-    const content = document.getElementById('summary-content').textContent;
+    const content = document.getElementById('summary-content').textContent
     navigator.clipboard.writeText(content).then(() => {
-      showNotification('Summary copied to clipboard!');
-    });
-  });
-  
+      showNotification('Summary copied to clipboard!')
+    })
+  })
+
   document.getElementById('close-panel').addEventListener('click', () => {
-    panel.remove();
-  });
-  
+    panel.remove()
+  })
+
   // Close on backdrop click
   panel.addEventListener('click', (e) => {
     if (e.target === panel) {
-      panel.remove();
+      panel.remove()
     }
-  });
-  
+  })
+
   // Close on Escape key
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
-      panel.remove();
-      document.removeEventListener('keydown', handleEscape);
+      panel.remove()
+      document.removeEventListener('keydown', handleEscape)
     }
-  };
-  document.addEventListener('keydown', handleEscape);
+  }
+  document.addEventListener('keydown', handleEscape)
 }
 
 // Check if auto-summarize is enabled
-async function checkAutoSummarize() {
+async function checkAutoSummarize () {
   try {
-    const response = await chrome.runtime.sendMessage({ action: 'getSettings' });
+    const response = await chrome.runtime.sendMessage({ action: 'getSettings' })
     if (response.autoSummary) {
       // Wait for page to load completely
       setTimeout(() => {
-        autoSummarize();
-      }, 2000);
+        autoSummarize()
+      }, 2000)
     }
   } catch (error) {
-    console.error('Failed to check auto-summarize setting:', error);
+    console.error('Failed to check auto-summarize setting:', error)
   }
 }
 
 // Auto-summarize current page
-async function autoSummarize() {
+async function autoSummarize () {
   try {
-    const content = extractPageContent();
+    const content = extractPageContent()
     if (content.text.length < 100) {
-      return; // Not enough content to summarize
+      return // Not enough content to summarize
     }
-    
+
     const response = await chrome.runtime.sendMessage({
       action: 'summarizeContent',
       content: content.text
-    });
-    
+    })
+
     if (response.success) {
-      showSummaryPanel(response.summary);
+      showSummaryPanel(response.summary)
     }
   } catch (error) {
-    console.error('Auto-summarize error:', error);
+    console.error('Auto-summarize error:', error)
   }
 }
 
 // Show notification
-function showNotification(message) {
-  const notification = document.createElement('div');
+function showNotification (message) {
+  const notification = document.createElement('div')
   notification.style.cssText = `
     position: fixed;
     top: 20px;
@@ -274,18 +274,18 @@ function showNotification(message) {
     font-size: 14px;
     z-index: 10002;
     animation: slideInRight 0.3s ease;
-  `;
-  notification.textContent = message;
-  
-  document.body.appendChild(notification);
-  
+  `
+  notification.textContent = message
+
+  document.body.appendChild(notification)
+
   setTimeout(() => {
-    notification.remove();
-  }, 3000);
+    notification.remove()
+  }, 3000)
 }
 
 // Add CSS for animations
-const animationStyle = document.createElement('style');
+const animationStyle = document.createElement('style')
 animationStyle.textContent = `
   @keyframes slideInRight {
     from {
@@ -297,12 +297,12 @@ animationStyle.textContent = `
       transform: translateX(0);
     }
   }
-`;
-document.head.appendChild(animationStyle);
+`
+document.head.appendChild(animationStyle)
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initContentScript);
+  document.addEventListener('DOMContentLoaded', initContentScript)
 } else {
-  initContentScript();
+  initContentScript()
 }
