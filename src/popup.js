@@ -54,15 +54,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Send content for summarization
-      const response = await chrome.runtime.sendMessage({
-        action: 'summarizeContent'
-      })
+      const { lastSummary } = await chrome.storage.local.get('lastSummary')
 
-      if (response.success) {
-        showSummary(response.summary)
+      if (lastSummary) {
+        showSummary(lastSummary)
         showNotification('Summary generated successfully!', 'success')
       } else {
-        showNotification(`Failed to generate summary: ${response.error}`, 'error')
+        showNotification('Failed to generate summary')
       }
     } catch (error) {
       console.error('Summarization error:', error)

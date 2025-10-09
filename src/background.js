@@ -4,8 +4,6 @@
 
 // Extension installation/startup
 chrome.runtime.onInstalled.addListener((details) => {
-  console.log('Extension installed/updated:', details)
-
   // Set default settings
   chrome.storage.sync.set({
     enabled: true,
@@ -16,8 +14,6 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 // Handle messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Background received message 123:', request)
-
   switch (request.action) {
     case 'getSettings':
       chrome.storage.sync.get(['enabled', 'autoSummary', 'summaryLength'], (result) => {
@@ -92,7 +88,6 @@ function truncateText (text, maxWords = 3000) {
 
   // Take first portion and add indicator
   const truncated = words.slice(0, maxWords).join(' ')
-  console.log(`Text truncated from ${words.length} to ${maxWords} words`)
 
   return `${truncated}...`
 }
@@ -101,7 +96,6 @@ const regex = /(p-[0-9]+\.xhtml)$/
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
     if (details.documentId && details.url.match(regex)) {
-      console.log('✅✅✅ ~~~ ~ background.js:84 ~ details:', details)
       if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
         console.log('Summarizer API or LanguageDetector API not supported')
         return
@@ -153,7 +147,6 @@ chrome.webRequest.onCompleted.addListener(
         })
 
         const summary = await summarizer.summarize(truncatedText)
-        console.log('🚀🚀🚀 ~~~ Summary generated:', summary)
 
         // Store summary for popup to retrieve
         await chrome.storage.local.set({
@@ -171,7 +164,6 @@ chrome.webRequest.onCompleted.addListener(
         }
       }
     }
-    console.log('Request finished:', details.url, 'status:', details.statusCode)
   },
   { urls: ['*://reader.readmoo.com/e/*'] }
 )
