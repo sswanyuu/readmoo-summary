@@ -78,20 +78,6 @@ function extractTextFromHTML (html) {
   return text
 }
 
-// Helper function to truncate text to fit Summarizer API limits
-function truncateText (text, maxWords = 3000) {
-  const words = text.split(/\s+/)
-
-  if (words.length <= maxWords) {
-    return text
-  }
-
-  // Take first portion and add indicator
-  const truncated = words.slice(0, maxWords).join(' ')
-
-  return `${truncated}...`
-}
-
 const regex = /(p-[0-9]+\.xhtml)$/
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
@@ -127,11 +113,14 @@ chrome.webRequest.onCompleted.addListener(
       try {
         // Fetch the XHTML content
         const res = await fetch(details.url)
+        console.log('🚀🚀🚀 ~~~ ~ background.js:132 ~ details.url:', details.url)
         const html = await res.text()
 
         const textContent = extractTextFromHTML(html)
-        // Truncate to fit API limits (roughly 3000 words / ~4000 tokens)
-        const truncatedText = truncateText(textContent, 3000)
+        // Truncate to fit API limits (roughly 20,000 characters)
+        const truncatedText = textContent.length > 20000
+          ? `${textContent.slice(0, 20000)}...`
+          : textContent
 
         const detector = await LanguageDetector.create({
           monitor (m) {
@@ -154,14 +143,8 @@ chrome.webRequest.onCompleted.addListener(
           lastSummaryUrl: details.url,
           lastSummaryTime: Date.now()
         })
-
-        // TODO: Get summary and display in the popup
-        // chrome.tabs.sendMessage(details.tabId, { action: 'summaryReady', summary: summary })
       } catch (error) {
         console.error('❌ Summarization failed:', error.message)
-        if (error.message.includes('too large')) {
-          console.error('Consider reducing maxWords in truncateText()')
-        }
       }
     }
   },
