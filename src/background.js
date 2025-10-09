@@ -128,13 +128,12 @@ chrome.webRequest.onCompleted.addListener(
   async (details) => {
     if (details.documentId && details.url.match(regex)) {
       console.log('✅✅✅ ~~~ ~ background.js:84 ~ details:', details)
-      if (!('Summarizer' in self)) {
-        console.log('Summarizer API not supported')
+      if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
+        console.log('Summarizer API or LanguageDetector API not supported')
         return
       }
 
       const options = {
-        sharedContext: 'This is a scientific article',
         type: 'key-points',
         format: 'markdown',
         length: 'medium',
@@ -147,7 +146,13 @@ chrome.webRequest.onCompleted.addListener(
 
       const availability = await Summarizer.availability()
       if (availability === 'unavailable') {
-        console.log("🚀🚀🚀 ~~~ ~ background.js:102 ~ The Summarizer API isn't usable.")
+        console.log("The Summarizer API isn't usable.")
+        return
+      }
+
+      const languageDetectorAvailability = await LanguageDetector.availability()
+      if (languageDetectorAvailability === 'unavailable') {
+        console.log("The LanguageDetector API isn't usable.")
         return
       }
 
@@ -156,21 +161,23 @@ chrome.webRequest.onCompleted.addListener(
         const res = await fetch(details.url)
         const html = await res.text()
 
-        // Extract text content (remove HTML tags)
         const textContent = extractTextFromHTML(html)
-        console.log('📄 Extracted text length:', textContent.length, 'characters')
-
         // Truncate to fit API limits (roughly 3000 words / ~4000 tokens)
         const truncatedText = truncateText(textContent, 3000)
 
-        // Check if text is too short
-        if (truncatedText.length < 100) {
-          console.warn('Text too short to summarize:', truncatedText.length, 'characters')
-          return
-        }
+        const detector = await LanguageDetector.create({
+          monitor (m) {
+            m.addEventListener('downloadprogress', (e) => {
+              console.log(`Downloaded ${e.loaded * 100}%`)
+            })
+          }
+        })
+        const results = await detector.detect(truncatedText)
+        const summarizer = await Summarizer.create({
+          ...options,
+          sharedContext: `Please reply with language ${results[0].detectedLanguage}`
+        })
 
-        // Create summarizer and generate summary
-        const summarizer = await Summarizer.create(options)
         const summary = await summarizer.summarize(truncatedText)
         console.log('🚀🚀🚀 ~~~ Summary generated:', summary)
 
@@ -194,12 +201,3 @@ chrome.webRequest.onCompleted.addListener(
   },
   { urls: ['*://reader.readmoo.com/e/*'] }
 )
-
-// async function fetchWithSummary(url) {
-//   const res = await fetch(url);
-//   const body = await res.text();
-
-//   const summarizer = await Summarizer.create();
-//   const summary = await summarizer.summarize(body);
-//   console.log(summary);
-// }
