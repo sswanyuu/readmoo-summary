@@ -1,3 +1,4 @@
+/* global Summarizer, DOMParser */
 // Background service worker for Chrome Extension v3
 // This script runs in the background and handles extension lifecycle events
 
@@ -78,11 +79,46 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 })
 
+// Helper function to extract text from HTML
+function extractTextFromHTML (html) {
+  // Create a temporary DOM parser
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+
+  // Remove script and style tags
+  const scripts = doc.querySelectorAll('script, style')
+  scripts.forEach(el => el.remove())
+
+  // Get text content
+  const text = doc.body.textContent || ''
+
+  // Clean up whitespace
+  return text
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .replace(/\n+/g, '\n') // Replace multiple newlines with single newline
+    .trim()
+}
+
+// Helper function to truncate text to fit Summarizer API limits
+function truncateText (text, maxWords = 3000) {
+  const words = text.split(/\s+/)
+
+  if (words.length <= maxWords) {
+    return text
+  }
+
+  // Take first portion and add indicator
+  const truncated = words.slice(0, maxWords).join(' ')
+  console.log(`Text truncated from ${words.length} to ${maxWords} words`)
+
+  return `${truncated}...`
+}
+
 const regex = /(p-[0-9]+\.xhtml)$/
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
     if (details.documentId && details.url.match(regex)) {
-      console.log("✅✅✅ ~~~ ~ background.js:84 ~ details:", details);
+      console.log('✅✅✅ ~~~ ~ background.js:84 ~ details:', details)
       if (!('Summarizer' in self)) {
         console.log('Summarizer API not supported')
         return
@@ -99,21 +135,51 @@ chrome.webRequest.onCompleted.addListener(
           })
         }
       }
+
       const availability = await Summarizer.availability()
       if (availability === 'unavailable') {
         console.log("🚀🚀🚀 ~~~ ~ background.js:102 ~ The Summarizer API isn't usable.")
         return
       }
-      const res = await fetch(details.url)
-      console.log("🚀🚀🚀 ~~~ ~ background.js:108 ~ res:", res);
-      const body = await res.text()
 
-      const summarizer = await Summarizer.create(options)
-      const summary = await summarizer.summarize(body)
-      console.log('🚀🚀🚀 ~~~ ~ background.js:109 ~ summary: ', summary)
+      try {
+        // Fetch the XHTML content
+        const res = await fetch(details.url)
+        const html = await res.text()
 
-      // TODO: Get summary and display in the popup
-      // chrome.tabs.sendMessage(details.tabId, { action: 'documentId', documentId: details.documentId })
+        // Extract text content (remove HTML tags)
+        const textContent = extractTextFromHTML(html)
+        console.log('📄 Extracted text length:', textContent.length, 'characters')
+
+        // Truncate to fit API limits (roughly 3000 words / ~4000 tokens)
+        const truncatedText = truncateText(textContent, 3000)
+
+        // Check if text is too short
+        if (truncatedText.length < 100) {
+          console.warn('Text too short to summarize:', truncatedText.length, 'characters')
+          return
+        }
+
+        // Create summarizer and generate summary
+        const summarizer = await Summarizer.create(options)
+        const summary = await summarizer.summarize(truncatedText)
+        console.log('🚀🚀🚀 ~~~ Summary generated:', summary)
+
+        // Store summary for popup to retrieve
+        await chrome.storage.local.set({
+          lastSummary: summary,
+          lastSummaryUrl: details.url,
+          lastSummaryTime: Date.now()
+        })
+
+        // TODO: Get summary and display in the popup
+        // chrome.tabs.sendMessage(details.tabId, { action: 'summaryReady', summary: summary })
+      } catch (error) {
+        console.error('❌ Summarization failed:', error.message)
+        if (error.message.includes('too large')) {
+          console.error('Consider reducing maxWords in truncateText()')
+        }
+      }
     }
     console.log('Request finished:', details.url, 'status:', details.statusCode)
   },
