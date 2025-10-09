@@ -53,18 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return
       }
 
-      // Get page content
-      const content = await getPageContent(tab.id)
-
-      if (!content) {
-        showNotification('No content found to summarize', 'error')
-        return
-      }
-
       // Send content for summarization
       const response = await chrome.runtime.sendMessage({
-        action: 'summarizeContent',
-        content
+        action: 'summarizeContent'
       })
 
       if (response.success) {
