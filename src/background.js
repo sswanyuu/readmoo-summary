@@ -1,4 +1,4 @@
-/* global Summarizer, DOMParser */
+/* global Summarizer */
 // Background service worker for Chrome Extension v3
 // This script runs in the background and handles extension lifecycle events
 
@@ -79,24 +79,33 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 })
 
-// Helper function to extract text from HTML
+// Helper function to extract text from HTML (Service Worker compatible)
 function extractTextFromHTML (html) {
-  // Create a temporary DOM parser
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(html, 'text/html')
+  // Remove script and style tags with their content
+  let text = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
 
-  // Remove script and style tags
-  const scripts = doc.querySelectorAll('script, style')
-  scripts.forEach(el => el.remove())
+  // Remove HTML tags
+  text = text.replace(/<[^>]+>/g, ' ')
 
-  // Get text content
-  const text = doc.body.textContent || ''
+  // Decode common HTML entities
+  text = text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
 
   // Clean up whitespace
-  return text
+  text = text
     .replace(/\s+/g, ' ') // Replace multiple spaces with single space
     .replace(/\n+/g, '\n') // Replace multiple newlines with single newline
     .trim()
+
+  return text
 }
 
 // Helper function to truncate text to fit Summarizer API limits
