@@ -77,15 +77,54 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     })
   }
 })
+
+const regex = /(p-[0-9]+\.xhtml)$/
 chrome.webRequest.onCompleted.addListener(
-  (details) => {
-    if(details.documentId) {
-      // This is the request with page content.
+  async (details) => {
+    if (details.documentId && details.url.match(regex)) {
+      console.log("✅✅✅ ~~~ ~ background.js:84 ~ details:", details);
+      if (!('Summarizer' in self)) {
+        console.log('Summarizer API not supported')
+        return
+      }
+
+      const options = {
+        sharedContext: 'This is a scientific article',
+        type: 'key-points',
+        format: 'markdown',
+        length: 'medium',
+        monitor (m) {
+          m.addEventListener('downloadprogress', (e) => {
+            console.log(`Downloaded ${e.loaded * 100}%`)
+          })
+        }
+      }
+      const availability = await Summarizer.availability()
+      if (availability === 'unavailable') {
+        console.log("🚀🚀🚀 ~~~ ~ background.js:102 ~ The Summarizer API isn't usable.")
+        return
+      }
+      const res = await fetch(details.url)
+      console.log("🚀🚀🚀 ~~~ ~ background.js:108 ~ res:", res);
+      const body = await res.text()
+
+      const summarizer = await Summarizer.create(options)
+      const summary = await summarizer.summarize(body)
+      console.log('🚀🚀🚀 ~~~ ~ background.js:109 ~ summary: ', summary)
+
       // TODO: Get summary and display in the popup
       // chrome.tabs.sendMessage(details.tabId, { action: 'documentId', documentId: details.documentId })
     }
-    console.log("Request finished:", details.url, "status:", details.statusCode, details);
+    console.log('Request finished:', details.url, 'status:', details.statusCode)
   },
-  { urls: ["*://reader.readmoo.com/e/*"] }
-);
+  { urls: ['*://reader.readmoo.com/e/*'] }
+)
 
+// async function fetchWithSummary(url) {
+//   const res = await fetch(url);
+//   const body = await res.text();
+
+//   const summarizer = await Summarizer.create();
+//   const summary = await summarizer.summarize(body);
+//   console.log(summary);
+// }
