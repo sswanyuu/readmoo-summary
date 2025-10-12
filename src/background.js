@@ -81,70 +81,73 @@ function extractTextFromHTML(html) {
 const regex = /(p-[0-9]+\.xhtml)$/
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
-    if (details.documentId && details.url.match(regex)) {
-      if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
-        console.log('Summarizer API or LanguageDetector API not supported')
-        return
-      }
+    if (!details.documentId || details.type !== 'xmlhttprequest') {
+      return
+    }
+    if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
+      console.log('Summarizer API or LanguageDetector API not supported')
+      return
+    }
+    console.log('🚀 ~ details:', details)
+    debugger
 
-      const options = {
-        type: 'key-points',
-        format: 'markdown',
-        length: 'medium',
+    const options = {
+      type: 'key-points',
+      format: 'markdown',
+      length: 'medium',
+      monitor(m) {
+        m.addEventListener('downloadprogress', (e) => {
+          console.log(`Downloaded ${e.loaded * 100}%`)
+        })
+      }
+    }
+
+    const availability = await Summarizer.availability()
+    if (availability === 'unavailable') {
+      console.log("The Summarizer API isn't usable.")
+      return
+    }
+
+    const languageDetectorAvailability = await LanguageDetector.availability()
+    if (languageDetectorAvailability === 'unavailable') {
+      console.log("The LanguageDetector API isn't usable.")
+      return
+    }
+
+    try {
+      // Fetch the XHTML content
+      const res = await fetch(details.url)
+      console.log('🚀🚀🚀 ~~~ ~ background.js:132 ~ details.url:', details.url)
+      const html = await res.text()
+
+      const textContent = extractTextFromHTML(html)
+      // Truncate to fit API limits (roughly 20,000 characters)
+      const truncatedText =
+        textContent.length > 20000 ? `${textContent.slice(0, 20000)}...` : textContent
+
+      const detector = await LanguageDetector.create({
         monitor(m) {
           m.addEventListener('downloadprogress', (e) => {
             console.log(`Downloaded ${e.loaded * 100}%`)
           })
         }
-      }
+      })
+      const results = await detector.detect(truncatedText)
+      const summarizer = await Summarizer.create({
+        ...options,
+        sharedContext: `Please reply with language ${results[0].detectedLanguage}`
+      })
 
-      const availability = await Summarizer.availability()
-      if (availability === 'unavailable') {
-        console.log("The Summarizer API isn't usable.")
-        return
-      }
+      const summary = await summarizer.summarize(truncatedText)
 
-      const languageDetectorAvailability = await LanguageDetector.availability()
-      if (languageDetectorAvailability === 'unavailable') {
-        console.log("The LanguageDetector API isn't usable.")
-        return
-      }
-
-      try {
-        // Fetch the XHTML content
-        const res = await fetch(details.url)
-        console.log('🚀🚀🚀 ~~~ ~ background.js:132 ~ details.url:', details.url)
-        const html = await res.text()
-
-        const textContent = extractTextFromHTML(html)
-        // Truncate to fit API limits (roughly 20,000 characters)
-        const truncatedText =
-          textContent.length > 20000 ? `${textContent.slice(0, 20000)}...` : textContent
-
-        const detector = await LanguageDetector.create({
-          monitor(m) {
-            m.addEventListener('downloadprogress', (e) => {
-              console.log(`Downloaded ${e.loaded * 100}%`)
-            })
-          }
-        })
-        const results = await detector.detect(truncatedText)
-        const summarizer = await Summarizer.create({
-          ...options,
-          sharedContext: `Please reply with language ${results[0].detectedLanguage}`
-        })
-
-        const summary = await summarizer.summarize(truncatedText)
-
-        // Store summary for popup to retrieve
-        await chrome.storage.local.set({
-          lastSummary: summary,
-          lastSummaryUrl: details.url,
-          lastSummaryTime: Date.now()
-        })
-      } catch (error) {
-        console.error('❌ Summarization failed:', error.message)
-      }
+      // Store summary for popup to retrieve
+      await chrome.storage.local.set({
+        lastSummary: summary,
+        lastSummaryUrl: details.url,
+        lastSummaryTime: Date.now()
+      })
+    } catch (error) {
+      console.error('❌ Summarization failed:', error.message)
     }
   },
   { urls: ['*://reader.readmoo.com/e/*'] }
