@@ -56,8 +56,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Main content */
@@ -75,7 +80,8 @@ body {
   gap: 12px;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn,
+.secondary-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,7 +280,7 @@ body {
   body {
     width: 320px;
   }
-  
+
   .popup-main {
     padding: 16px;
   }

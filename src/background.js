@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 })
 
 // Handle summarization logic
-async function handleSummarization (sendResponse) {
+async function handleSummarization(sendResponse) {
   try {
     // This is where you would integrate with your summarization service
     // For now, we'll simulate a summary
@@ -50,7 +50,7 @@ async function handleSummarization (sendResponse) {
 }
 
 // Helper function to extract text from HTML (Service Worker compatible)
-function extractTextFromHTML (html) {
+function extractTextFromHTML(html) {
   // Remove script and style tags with their content
   let text = html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
@@ -91,7 +91,7 @@ chrome.webRequest.onCompleted.addListener(
         type: 'key-points',
         format: 'markdown',
         length: 'medium',
-        monitor (m) {
+        monitor(m) {
           m.addEventListener('downloadprogress', (e) => {
             console.log(`Downloaded ${e.loaded * 100}%`)
           })
@@ -118,12 +118,11 @@ chrome.webRequest.onCompleted.addListener(
 
         const textContent = extractTextFromHTML(html)
         // Truncate to fit API limits (roughly 20,000 characters)
-        const truncatedText = textContent.length > 20000
-          ? `${textContent.slice(0, 20000)}...`
-          : textContent
+        const truncatedText =
+          textContent.length > 20000 ? `${textContent.slice(0, 20000)}...` : textContent
 
         const detector = await LanguageDetector.create({
-          monitor (m) {
+          monitor(m) {
             m.addEventListener('downloadprogress', (e) => {
               console.log(`Downloaded ${e.loaded * 100}%`)
             })

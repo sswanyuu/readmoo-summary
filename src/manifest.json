@@ -3,15 +3,8 @@
   "name": "Readmoo Summary Extension",
   "version": "1.0.0",
   "description": "A Chrome extension for summarizing content from Readmoo",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "scripting",
-    "webRequest"
-  ],
-  "host_permissions": [
-    "https://readmoo.com/*", "*://reader.readmoo.com/*"
-  ],
+  "permissions": ["activeTab", "storage", "scripting", "webRequest"],
+  "host_permissions": ["https://readmoo.com/*", "*://reader.readmoo.com/*"],
   "background": {
     "service_worker": "background.js"
   },

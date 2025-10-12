@@ -4,7 +4,7 @@
 console.log('Readmoo Summary content script loaded')
 
 // Initialize content script
-function initContentScript () {
+function initContentScript() {
   // Check if we're on a Readmoo page
   if (!window.location.hostname.includes('readmoo.com')) {
     return
@@ -21,7 +21,7 @@ function initContentScript () {
 }
 
 // Add visual indicator that extension is active
-function addExtensionIndicator () {
+function addExtensionIndicator() {
   // Create floating indicator
   const indicator = document.createElement('div')
   indicator.id = 'readmoo-summary-indicator'
@@ -61,7 +61,7 @@ function addExtensionIndicator () {
 }
 
 // Handle messages from extension
-function handleMessage (request, sender, sendResponse) {
+function handleMessage(request, sender, sendResponse) {
   console.log('Content script received message:', request)
 
   switch (request.action) {
@@ -86,7 +86,7 @@ function handleMessage (request, sender, sendResponse) {
 }
 
 // Extract main content from the page
-function extractPageContent () {
+function extractPageContent() {
   const selectors = [
     'article',
     '.content',
@@ -119,7 +119,7 @@ function extractPageContent () {
 }
 
 // Highlight specific content on the page
-function highlightContent (selector) {
+function highlightContent(selector) {
   const element = document.querySelector(selector)
   if (element) {
     element.style.cssText += `
@@ -132,7 +132,7 @@ function highlightContent (selector) {
 }
 
 // Show summary panel
-function showSummaryPanel (summary = null) {
+function showSummaryPanel(summary = null) {
   // Remove existing panel if any
   const existingPanel = document.getElementById('readmoo-summary-panel')
   if (existingPanel) {
@@ -225,7 +225,7 @@ function showSummaryPanel (summary = null) {
 }
 
 // Check if auto-summarize is enabled
-async function checkAutoSummarize () {
+async function checkAutoSummarize() {
   try {
     const response = await chrome.runtime.sendMessage({ action: 'getSettings' })
     if (response.autoSummary) {
@@ -240,7 +240,7 @@ async function checkAutoSummarize () {
 }
 
 // Auto-summarize current page
-async function autoSummarize () {
+async function autoSummarize() {
   try {
     const content = extractPageContent()
     if (content.text.length < 100) {
@@ -261,7 +261,7 @@ async function autoSummarize () {
 }
 
 // Show notification
-function showNotification (message) {
+function showNotification(message) {
   const notification = document.createElement('div')
   notification.style.cssText = `
     position: fixed;

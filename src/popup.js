@@ -27,9 +27,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   helpBtn.addEventListener('click', openHelp)
 
   // Load settings from storage
-  async function loadSettings () {
+  async function loadSettings() {
     try {
-      const response = await chrome.runtime.sendMessage({ action: 'getSettings' })
+      const response = await chrome.runtime.sendMessage({
+        action: 'getSettings'
+      })
       if (response) {
         autoSummaryToggle.checked = response.autoSummary || false
         summaryLengthSelect.value = response.summaryLength || 'medium'
@@ -41,12 +43,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle summarize button click
-  async function handleSummarize () {
+  async function handleSummarize() {
     try {
       setLoading(true)
 
       // Get current tab
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      })
 
       if (!tab.url.includes('readmoo.com')) {
         showNotification('Please navigate to a Readmoo page first', 'error')
@@ -71,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Get page content from current tab
-  async function getPageContent (tabId) {
+  async function getPageContent(tabId) {
     try {
       const results = await chrome.scripting.executeScript({
         target: { tabId },
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Function to extract content (runs in page context)
-  function extractPageContent () {
+  function extractPageContent() {
     // Try to find main content areas
     const selectors = [
       'article',
@@ -110,9 +115,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle toggle button
-  async function handleToggle () {
+  async function handleToggle() {
     try {
-      const currentSettings = await chrome.runtime.sendMessage({ action: 'getSettings' })
+      const currentSettings = await chrome.runtime.sendMessage({
+        action: 'getSettings'
+      })
       const newEnabled = !currentSettings.enabled
 
       await chrome.runtime.sendMessage({
@@ -121,10 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
 
       updateStatusIndicator(newEnabled)
-      showNotification(
-        newEnabled ? 'Extension enabled' : 'Extension disabled',
-        'success'
-      )
+      showNotification(newEnabled ? 'Extension enabled' : 'Extension disabled', 'success')
     } catch (error) {
       console.error('Toggle error:', error)
       showNotification('Failed to toggle extension', 'error')
@@ -132,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle auto-summary toggle
-  async function handleAutoSummaryChange () {
+  async function handleAutoSummaryChange() {
     try {
       await chrome.runtime.sendMessage({
         action: 'updateSettings',
@@ -144,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle summary length change
-  async function handleSummaryLengthChange () {
+  async function handleSummaryLengthChange() {
     try {
       await chrome.runtime.sendMessage({
         action: 'updateSettings',
@@ -156,13 +160,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Show summary in popup
-  function showSummary (summary) {
+  function showSummary(summary) {
     summaryContent.textContent = summary
     summarySection.style.display = 'block'
   }
 
   // Handle copy summary
-  async function handleCopySummary () {
+  async function handleCopySummary() {
     try {
       await navigator.clipboard.writeText(summaryContent.textContent)
       showNotification('Summary copied to clipboard!', 'success')
@@ -173,13 +177,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Handle save summary
-  async function handleSaveSummary () {
+  async function handleSaveSummary() {
     try {
       const summary = summaryContent.textContent
       const timestamp = new Date().toISOString()
 
       // Save to storage
-      const savedSummaries = await chrome.storage.local.get(['summaries']) || { summaries: [] }
+      const savedSummaries = (await chrome.storage.local.get(['summaries'])) || { summaries: [] }
       savedSummaries.summaries = savedSummaries.summaries || []
       savedSummaries.summaries.push({
         content: summary,
@@ -196,17 +200,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Open options page
-  function openOptions () {
+  function openOptions() {
     chrome.runtime.openOptionsPage()
   }
 
   // Open help
-  function openHelp () {
+  function openHelp() {
     chrome.tabs.create({ url: 'https://github.com/your-repo/readmoo-summary' })
   }
 
   // Update status indicator
-  function updateStatusIndicator (enabled) {
+  function updateStatusIndicator(enabled) {
     const statusDot = statusIndicator.querySelector('.status-dot')
     const statusText = statusIndicator.querySelector('.status-text')
 
@@ -220,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Set loading state
-  function setLoading (loading) {
+  function setLoading(loading) {
     const container = document.querySelector('.popup-container')
     if (loading) {
       container.classList.add('loading')
@@ -232,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Show notification
-  function showNotification (message, type = 'info') {
+  function showNotification(message, type = 'info') {
     // Create notification element
     const notification = document.createElement('div')
     notification.className = `notification notification-${type}`

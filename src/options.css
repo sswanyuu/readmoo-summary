@@ -145,7 +145,8 @@ body {
   transform: translateX(24px);
 }
 
-.select-input, .text-input {
+.select-input,
+.text-input {
   padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -157,7 +158,8 @@ body {
   flex-shrink: 0;
 }
 
-.select-input:focus, .text-input:focus {
+.select-input:focus,
+.text-input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -280,7 +282,8 @@ body {
   margin-bottom: 16px;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn,
+.secondary-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
@@ -359,30 +362,32 @@ body {
     margin: 0;
     box-shadow: none;
   }
-  
+
   .options-header {
     padding: 30px 20px;
   }
-  
+
   .options-main {
     padding: 20px;
   }
-  
+
   .setting-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
-  .select-input, .text-input {
+
+  .select-input,
+  .text-input {
     min-width: 100%;
   }
-  
+
   .footer-actions {
     flex-direction: column;
   }
-  
-  .primary-btn, .secondary-btn {
+
+  .primary-btn,
+  .secondary-btn {
     width: 100%;
   }
 }
@@ -408,6 +413,10 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

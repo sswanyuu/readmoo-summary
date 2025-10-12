@@ -5,9 +5,7 @@ module.exports = {
     node: true,
     webextensions: true
   },
-  extends: [
-    'standard'
-  ],
+  extends: ['standard', 'plugin:prettier/recommended'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module'
@@ -18,7 +16,8 @@ module.exports = {
     'prefer-const': 'error',
     'no-var': 'error',
     'object-shorthand': 'error',
-    'prefer-template': 'error'
+    'prefer-template': 'error',
+    'prettier/prettier': 'warn'
   },
   globals: {
     chrome: 'readonly',
