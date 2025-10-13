@@ -10,39 +10,19 @@
     <div class="popup-container">
       <header class="popup-header">
         <h1>📚 Readmoo Summary</h1>
-        <div class="status-indicator" id="statusIndicator">
-          <span class="status-dot"></span>
-          <span class="status-text">Active</span>
-        </div>
       </header>
 
       <main class="popup-main">
         <div class="action-section">
-          <button id="summarizeBtn" class="primary-btn">
-            <span class="btn-icon">📝</span>
-            Summarize Current Page
-          </button>
-
-          <button id="toggleBtn" class="secondary-btn">
-            <span class="btn-icon">⚙️</span>
-            Toggle Extension
-          </button>
-        </div>
-
-        <div class="settings-section">
-          <div class="setting-item">
-            <label for="autoSummary">Auto-summarize</label>
-            <input type="checkbox" id="autoSummary" class="toggle-switch" />
-          </div>
-
-          <div class="setting-item">
-            <label for="summaryLength">Summary Length</label>
-            <select id="summaryLength" class="select-input">
+          <div class="summary-length-section">
+            <label for="summaryLength">Summary Length:</label>
+            <select id="summaryLength" class="length-select">
               <option value="short">Short</option>
               <option value="medium" selected>Medium</option>
               <option value="long">Long</option>
             </select>
           </div>
+          <button id="summarizeBtn" class="primary-btn">📝 Summarize Current Page</button>
         </div>
 
         <div class="summary-section" id="summarySection" style="display: none">
@@ -53,12 +33,11 @@
             <button id="saveSummary" class="action-btn">💾 Save</button>
           </div>
         </div>
-      </main>
 
-      <footer class="popup-footer">
-        <button id="optionsBtn" class="link-btn">⚙️ Options</button>
-        <button id="helpBtn" class="link-btn">❓ Help</button>
-      </footer>
+        <div class="footer-actions">
+          <button id="settingsBtn" class="link-btn">⚙️ Settings</button>
+        </div>
+      </main>
     </div>
 
     <script src="popup.js"></script>

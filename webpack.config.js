@@ -67,16 +67,16 @@ module.exports = (env, argv) => {
             to: 'popup.css'
           },
           {
+            from: 'src/content.css',
+            to: 'content.css'
+          },
+          {
             from: 'src/options.html',
             to: 'options.html'
           },
           {
             from: 'src/options.css',
             to: 'options.css'
-          },
-          {
-            from: 'src/content.css',
-            to: 'content.css'
           }
         ]
       }),

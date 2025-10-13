@@ -3,179 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Readmoo Summary - Options</title>
+    <title>Readmoo Summary - Settings</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <div class="options-container">
       <header class="options-header">
-        <div class="header-content">
-          <h1>📚 Readmoo Summary Settings</h1>
-          <p>Configure your summarization preferences and extension behavior</p>
-        </div>
+        <h1>📚 Readmoo Summary Settings</h1>
+        <p>Configure your summary preferences</p>
       </header>
 
       <main class="options-main">
-        <div class="settings-grid">
-          <!-- General Settings -->
-          <section class="settings-section">
-            <h2>General Settings</h2>
-            <div class="setting-group">
-              <div class="setting-item">
-                <label for="enabled">
-                  <span class="setting-label">Enable Extension</span>
-                  <span class="setting-description">Turn the extension on or off</span>
-                </label>
-                <input type="checkbox" id="enabled" class="toggle-switch" />
-              </div>
+        <div class="settings-section">
+          <h2>Summary Settings</h2>
+          
+          <div class="setting-item">
+            <label for="defaultLength">Default Summary Length:</label>
+            <select id="defaultLength" class="setting-select">
+              <option value="short">Short (3 points)</option>
+              <option value="medium" selected>Medium (5 points)</option>
+              <option value="long">Long (7 points)</option>
+            </select>
+          </div>
 
-              <div class="setting-item">
-                <label for="autoSummary">
-                  <span class="setting-label">Auto-summarize</span>
-                  <span class="setting-description"
-                    >Automatically summarize content when visiting Readmoo pages</span
-                  >
-                </label>
-                <input type="checkbox" id="autoSummary" class="toggle-switch" />
-              </div>
-            </div>
-          </section>
-
-          <!-- Summarization Settings -->
-          <section class="settings-section">
-            <h2>Summarization Settings</h2>
-            <div class="setting-group">
-              <div class="setting-item">
-                <label for="summaryLength">
-                  <span class="setting-label">Summary Length</span>
-                  <span class="setting-description"
-                    >Choose how detailed you want the summaries to be</span
-                  >
-                </label>
-                <select id="summaryLength" class="select-input">
-                  <option value="short">Short (1-2 sentences)</option>
-                  <option value="medium">Medium (3-5 sentences)</option>
-                  <option value="long">Long (5+ sentences)</option>
-                </select>
-              </div>
-
-              <div class="setting-item">
-                <label for="summaryLanguage">
-                  <span class="setting-label">Summary Language</span>
-                  <span class="setting-description">Language for generated summaries</span>
-                </label>
-                <select id="summaryLanguage" class="select-input">
-                  <option value="auto">Auto-detect</option>
-                  <option value="zh-TW">繁體中文</option>
-                  <option value="zh-CN">简体中文</option>
-                  <option value="en">English</option>
-                  <option value="ja">日本語</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <!-- Display Settings -->
-          <section class="settings-section">
-            <h2>Display Settings</h2>
-            <div class="setting-group">
-              <div class="setting-item">
-                <label for="showIndicator">
-                  <span class="setting-label">Show Page Indicator</span>
-                  <span class="setting-description"
-                    >Display floating indicator on Readmoo pages</span
-                  >
-                </label>
-                <input type="checkbox" id="showIndicator" class="toggle-switch" />
-              </div>
-
-              <div class="setting-item">
-                <label for="theme">
-                  <span class="setting-label">Theme</span>
-                  <span class="setting-description">Choose your preferred theme</span>
-                </label>
-                <select id="theme" class="select-input">
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                  <option value="auto">Auto (follow system)</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <!-- Advanced Settings -->
-          <section class="settings-section">
-            <h2>Advanced Settings</h2>
-            <div class="setting-group">
-              <div class="setting-item">
-                <label for="apiEndpoint">
-                  <span class="setting-label">API Endpoint</span>
-                  <span class="setting-description"
-                    >Custom API endpoint for summarization (optional)</span
-                  >
-                </label>
-                <input
-                  type="url"
-                  id="apiEndpoint"
-                  class="text-input"
-                  placeholder="https://api.example.com/summarize"
-                />
-              </div>
-
-              <div class="setting-item">
-                <label for="apiKey">
-                  <span class="setting-label">API Key</span>
-                  <span class="setting-description">API key for custom endpoint (optional)</span>
-                </label>
-                <input
-                  type="password"
-                  id="apiKey"
-                  class="text-input"
-                  placeholder="Enter your API key"
-                />
-              </div>
-
-              <div class="setting-item">
-                <label for="debugMode">
-                  <span class="setting-label">Debug Mode</span>
-                  <span class="setting-description"
-                    >Enable detailed logging for troubleshooting</span
-                  >
-                </label>
-                <input type="checkbox" id="debugMode" class="toggle-switch" />
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <!-- Saved Summaries -->
-        <section class="settings-section">
-          <h2>Saved Summaries</h2>
-          <div class="summaries-container">
-            <div class="summaries-header">
-              <span>Your saved summaries will appear here</span>
-              <button id="clearSummaries" class="danger-btn">Clear All</button>
-            </div>
-            <div id="summariesList" class="summaries-list">
-              <!-- Summaries will be loaded here -->
+          <div class="setting-item">
+            <label for="autoClear">Auto-clear summary on popup open:</label>
+            <div class="toggle-container">
+              <input type="checkbox" id="autoClear" class="toggle-input" checked>
+              <label for="autoClear" class="toggle-label">
+                <span class="toggle-slider"></span>
+              </label>
             </div>
           </div>
-        </section>
+
+          <div class="setting-item">
+            <label for="showNotifications">Show notifications:</label>
+            <div class="toggle-container">
+              <input type="checkbox" id="showNotifications" class="toggle-input" checked>
+              <label for="showNotifications" class="toggle-label">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h2>Content Settings</h2>
+          
+          <div class="setting-item">
+            <label for="minContentLength">Minimum content length:</label>
+            <input type="number" id="minContentLength" class="setting-input" value="100" min="50" max="1000">
+            <p class="setting-description">Minimum number of characters required for summarization</p>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h2>About</h2>
+          <div class="about-info">
+            <p><strong>Version:</strong> 1.0.0</p>
+            <p><strong>Description:</strong> A Chrome extension for summarizing content from Readmoo</p>
+            <p><strong>Features:</strong></p>
+            <ul>
+              <li>Smart content extraction from Readmoo pages</li>
+              <li>Adjustable summary length (3-7 key points)</li>
+              <li>Automatic language detection</li>
+              <li>Content filtering for better results</li>
+            </ul>
+          </div>
+        </div>
       </main>
 
       <footer class="options-footer">
-        <div class="footer-actions">
-          <button id="resetSettings" class="secondary-btn">Reset to Defaults</button>
-          <button id="saveSettings" class="primary-btn">Save Settings</button>
+        <div class="button-group">
+          <button id="saveBtn" class="primary-btn">💾 Save Settings</button>
+          <button id="resetBtn" class="secondary-btn">🔄 Reset to Default</button>
         </div>
-        <div class="footer-info">
-          <p>Readmoo Summary Extension v1.0.0</p>
-          <p>
-            <a href="#" id="helpLink">Help & Support</a> •
-            <a href="#" id="privacyLink">Privacy Policy</a> •
-            <a href="#" id="githubLink">GitHub</a>
-          </p>
-        </div>
+        <div class="status-message" id="statusMessage"></div>
       </footer>
     </div>
 

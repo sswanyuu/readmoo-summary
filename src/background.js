@@ -6,7 +6,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
     case 'summarizeContent':
-      handleSummarization(request.content, sendResponse)
+      handleSummarization(request.content, sendResponse, request.summaryLength)
       return true
 
     default:
@@ -22,7 +22,7 @@ let currentSummary = null
 let currentSummaryUrl = null
 
 // Handle summarization logic (manual trigger from popup)
-async function handleSummarization(content, sendResponse) {
+async function handleSummarization(content, sendResponse, summaryLength = 'medium') {
   try {
     // Check API availability
     if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
@@ -32,11 +32,11 @@ async function handleSummarization(content, sendResponse) {
     }
 
     // Check if we already have a summary for the current content
-    if (latestRequestDetails && currentSummary && currentSummaryUrl === latestRequestDetails.url) {
-      console.log('🚀 ~ handleSummarization ~ using cached summary for:', latestRequestDetails.url)
-      sendResponse({ success: true, summary: currentSummary })
-      return
-    }
+    // if (latestRequestDetails && currentSummary && currentSummaryUrl === latestRequestDetails.url) {
+    //   console.log('🚀 ~ handleSummarization ~ using cached summary for:', latestRequestDetails.url)
+    //   sendResponse({ success: true, summary: currentSummary })
+    //   return
+    // }
 
     // Use provided content or fetch from latest request
     let contentToUse = content
@@ -90,7 +90,7 @@ async function handleSummarization(content, sendResponse) {
     const options = {
       type: 'key-points',
       format: 'markdown',
-      length: 'medium'
+      length: summaryLength
     }
 
     const availability = await Summarizer.availability()
@@ -121,7 +121,9 @@ async function handleSummarization(content, sendResponse) {
     const results = await detector.detect(truncatedText)
 
     const summarizer = await Summarizer.create({
-      ...options,
+      type: options.type,
+      format: options.format,
+      length: options.length,
       sharedContext: `Please reply with language ${results[0].detectedLanguage}`,
       monitor(m) {
         m.addEventListener('downloadprogress', (e) => {
@@ -131,12 +133,6 @@ async function handleSummarization(content, sendResponse) {
     })
 
     const summary = await summarizer.summarize(truncatedText)
-
-    // Store summary for popup to retrieve
-    await chrome.storage.local.set({
-      lastSummary: summary,
-      lastSummaryTime: Date.now()
-    })
 
     // Cache the current summary
     currentSummary = summary

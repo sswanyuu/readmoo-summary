@@ -1,46 +1,71 @@
 // Popup script for Chrome Extension
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🚀 ~ DOMContentLoaded ~ popup script starting')
+
   // Get DOM elements
   const summarizeBtn = document.getElementById('summarizeBtn')
-  const toggleBtn = document.getElementById('toggleBtn')
-  const autoSummaryToggle = document.getElementById('autoSummary')
-  const summaryLengthSelect = document.getElementById('summaryLength')
   const summarySection = document.getElementById('summarySection')
   const summaryContent = document.getElementById('summaryContent')
   const copySummaryBtn = document.getElementById('copySummary')
-  const saveSummaryBtn = document.getElementById('saveSummary')
-  const optionsBtn = document.getElementById('optionsBtn')
-  const helpBtn = document.getElementById('helpBtn')
-  const statusIndicator = document.getElementById('statusIndicator')
+  const summaryLengthSelect = document.getElementById('summaryLength')
+  const settingsBtn = document.getElementById('settingsBtn')
 
-  // Load settings on popup open
-  await loadSettings()
+  console.log('🚀 ~ DOM elements:', {
+    summarizeBtn,
+    summarySection,
+    summaryContent,
+    copySummaryBtn,
+    settingsBtn
+  })
 
   // Event listeners
-  summarizeBtn.addEventListener('click', handleSummarize)
-  toggleBtn.addEventListener('click', handleToggle)
-  autoSummaryToggle.addEventListener('change', handleAutoSummaryChange)
-  summaryLengthSelect.addEventListener('change', handleSummaryLengthChange)
-  copySummaryBtn.addEventListener('click', handleCopySummary)
-  saveSummaryBtn.addEventListener('click', handleSaveSummary)
-  optionsBtn.addEventListener('click', openOptions)
-  helpBtn.addEventListener('click', openHelp)
-
-  // Load settings from storage
-  async function loadSettings() {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        action: 'getSettings'
-      })
-      if (response) {
-        autoSummaryToggle.checked = response.autoSummary || false
-        summaryLengthSelect.value = response.summaryLength || 'medium'
-        updateStatusIndicator(response.enabled)
+  if (summarizeBtn) {
+    summarizeBtn.addEventListener('click', handleSummarize)
+  }
+  
+  if (copySummaryBtn) {
+    copySummaryBtn.addEventListener('click', handleCopySummary)
+  }
+  
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', async () => {
+      console.log('🚀 ~ Settings button clicked')
+      try {
+        // Try chrome.runtime.openOptionsPage first
+        if (chrome.runtime.openOptionsPage) {
+          await chrome.runtime.openOptionsPage()
+          console.log('🚀 ~ Options page opened via openOptionsPage')
+        } else {
+          // Fallback to chrome.tabs.create
+          await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
+          console.log('🚀 ~ Options page opened via tabs.create')
+        }
+      } catch (error) {
+        console.error('🚀 ~ Failed to open options page:', error)
+        // Try fallback method
+        try {
+          await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
+          console.log('🚀 ~ Options page opened via fallback')
+        } catch (fallbackError) {
+          console.error('🚀 ~ Fallback also failed:', fallbackError)
+        }
       }
-    } catch (error) {
-      console.error('Failed to load settings:', error)
+    })
+  } else {
+    console.error('🚀 ~ Settings button not found')
+  }
+
+  // Clear summary section on startup
+  function clearSummary() {
+    if (summaryContent && summarySection) {
+      summaryContent.textContent = ''
+      summarySection.style.display = 'none'
+      console.log('🚀 ~ clearSummary ~ summary section cleared')
     }
   }
+
+  // Clear summary on popup open
+  clearSummary()
 
   // Handle summarize button click
   async function handleSummarize() {
@@ -55,17 +80,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!tab.url.includes('readmoo.com')) {
         showNotification('Please navigate to a Readmoo page first', 'error')
+        setLoading(false)
         return
       }
 
-      // Send content for summarization
-      const { lastSummary } = await chrome.storage.local.get('lastSummary')
+      // Get page content from current tab
+      const content = await getPageContent(tab.id)
 
-      if (lastSummary) {
-        showSummary(lastSummary)
+      if (!content) {
+        console.log('🚀 ~ handleSummarize ~ no content extracted, trying latest request')
+      }
+
+      // Get selected summary length
+      const summaryLength = summaryLengthSelect.value
+
+      // Send content for summarization to background script
+      console.log('🚀 ~ handleSummarize ~ sending message to background')
+      const response = await chrome.runtime.sendMessage({
+        action: 'summarizeContent',
+        content: content || null,
+        summaryLength
+      })
+
+      console.log('🚀 ~ handleSummarize ~ received response:', response)
+
+      if (response && response.success) {
+        console.log('🚀 ~ handleSummarize ~ showing summary:', response.summary)
+        showSummary(response.summary)
         showNotification('Summary generated successfully!', 'success')
       } else {
-        showNotification('Failed to generate summary')
+        console.log('🚀 ~ handleSummarize ~ error response:', response)
+        showNotification(
+          `Failed to generate summary: ${response?.error || 'Unknown error'}`,
+          'error'
+        )
       }
     } catch (error) {
       console.error('Summarization error:', error)
@@ -83,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         function: extractPageContent
       })
 
+      console.log('🚀 ~ getPageContent ~ results:', results)
       return results[0]?.result || null
     } catch (error) {
       console.error('Failed to extract content:', error)
@@ -92,13 +141,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to extract content (runs in page context)
   function extractPageContent() {
-    // Try to find main content areas
+    console.log('🚀 ~ extractPageContent ~ running in page context')
+
+    // Try to find main content areas with more specific selectors for Readmoo
     const selectors = [
-      'article',
-      '.content',
-      '.main-content',
+      '.reader-content',
       '.book-content',
       '.chapter-content',
+      '.content-body',
+      '.article-content',
+      'article',
+      '.main-content',
+      '.content',
       'main',
       '.post-content'
     ]
@@ -106,63 +160,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const selector of selectors) {
       const element = document.querySelector(selector)
       if (element && element.textContent.trim().length > 100) {
-        return element.textContent.trim()
+        // Filter out script and style content
+        const text = element.textContent.trim()
+        if (
+          !text.includes('FB.init') &&
+          !text.includes('Google Tag Manager') &&
+          !text.includes('facebook-jssdk')
+        ) {
+          console.log('🚀 ~ extractPageContent ~ found content with selector:', selector)
+          console.log('🚀 ~ extractPageContent ~ content preview:', text.substring(0, 200))
+          return text
+        }
       }
     }
 
-    // Fallback to body content
-    return document.body.textContent.trim()
-  }
+    // Fallback to body content but filter out scripts
+    const bodyContent = document.body.textContent.trim()
+    console.log('🚀 ~ extractPageContent ~ body content length:', bodyContent.length)
 
-  // Handle toggle button
-  async function handleToggle() {
-    try {
-      const currentSettings = await chrome.runtime.sendMessage({
-        action: 'getSettings'
-      })
-      const newEnabled = !currentSettings.enabled
-
-      await chrome.runtime.sendMessage({
-        action: 'updateSettings',
-        settings: { enabled: newEnabled }
-      })
-
-      updateStatusIndicator(newEnabled)
-      showNotification(newEnabled ? 'Extension enabled' : 'Extension disabled', 'success')
-    } catch (error) {
-      console.error('Toggle error:', error)
-      showNotification('Failed to toggle extension', 'error')
+    // Filter out common tracking scripts
+    if (bodyContent.includes('FB.init') || bodyContent.includes('Google Tag Manager')) {
+      console.log('🚀 ~ extractPageContent ~ filtered out tracking content')
+      return null
     }
-  }
 
-  // Handle auto-summary toggle
-  async function handleAutoSummaryChange() {
-    try {
-      await chrome.runtime.sendMessage({
-        action: 'updateSettings',
-        settings: { autoSummary: autoSummaryToggle.checked }
-      })
-    } catch (error) {
-      console.error('Auto-summary toggle error:', error)
-    }
-  }
-
-  // Handle summary length change
-  async function handleSummaryLengthChange() {
-    try {
-      await chrome.runtime.sendMessage({
-        action: 'updateSettings',
-        settings: { summaryLength: summaryLengthSelect.value }
-      })
-    } catch (error) {
-      console.error('Summary length change error:', error)
-    }
+    return bodyContent
   }
 
   // Show summary in popup
   function showSummary(summary) {
-    summaryContent.textContent = summary
-    summarySection.style.display = 'block'
+    console.log('🚀 ~ showSummary ~ summary:', summary)
+    console.log('🚀 ~ showSummary ~ summaryContent:', summaryContent)
+    console.log('🚀 ~ showSummary ~ summarySection:', summarySection)
+
+    if (!summaryContent) {
+      console.error('🚀 ~ showSummary ~ summaryContent element not found')
+      return
+    }
+
+    if (!summarySection) {
+      console.error('🚀 ~ showSummary ~ summarySection element not found')
+      return
+    }
+
+    try {
+      summaryContent.textContent = summary
+      summarySection.style.display = 'block'
+      console.log('🚀 ~ showSummary ~ summary displayed successfully')
+      console.log('🚀 ~ showSummary ~ summarySection display:', summarySection.style.display)
+      console.log('🚀 ~ showSummary ~ summaryContent text:', summaryContent.textContent)
+
+      // Scroll to summary section
+      summarySection.scrollIntoView({ behavior: 'smooth' })
+    } catch (error) {
+      console.error('🚀 ~ showSummary ~ error:', error)
+    }
   }
 
   // Handle copy summary
@@ -176,62 +228,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Handle save summary
-  async function handleSaveSummary() {
-    try {
-      const summary = summaryContent.textContent
-      const timestamp = new Date().toISOString()
-
-      // Save to storage
-      const savedSummaries = (await chrome.storage.local.get(['summaries'])) || { summaries: [] }
-      savedSummaries.summaries = savedSummaries.summaries || []
-      savedSummaries.summaries.push({
-        content: summary,
-        timestamp,
-        url: (await chrome.tabs.query({ active: true, currentWindow: true }))[0].url
-      })
-
-      await chrome.storage.local.set({ summaries: savedSummaries.summaries })
-      showNotification('Summary saved!', 'success')
-    } catch (error) {
-      console.error('Save error:', error)
-      showNotification('Failed to save summary', 'error')
-    }
-  }
-
-  // Open options page
-  function openOptions() {
-    chrome.runtime.openOptionsPage()
-  }
-
-  // Open help
-  function openHelp() {
-    chrome.tabs.create({ url: 'https://github.com/your-repo/readmoo-summary' })
-  }
-
-  // Update status indicator
-  function updateStatusIndicator(enabled) {
-    const statusDot = statusIndicator.querySelector('.status-dot')
-    const statusText = statusIndicator.querySelector('.status-text')
-
-    if (enabled) {
-      statusDot.style.background = '#4ade80'
-      statusText.textContent = 'Active'
-    } else {
-      statusDot.style.background = '#ef4444'
-      statusText.textContent = 'Inactive'
-    }
-  }
-
   // Set loading state
   function setLoading(loading) {
-    const container = document.querySelector('.popup-container')
     if (loading) {
-      container.classList.add('loading')
       summarizeBtn.textContent = 'Summarizing...'
+      summarizeBtn.disabled = true
     } else {
-      container.classList.remove('loading')
-      summarizeBtn.innerHTML = '<span class="btn-icon">📝</span>Summarize Current Page'
+      summarizeBtn.textContent = '📝 Summarize Current Page'
+      summarizeBtn.disabled = false
     }
   }
 
