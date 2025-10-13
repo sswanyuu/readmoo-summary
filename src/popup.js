@@ -9,6 +9,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const copySummaryBtn = document.getElementById('copySummary')
   const summaryLengthSelect = document.getElementById('summaryLength')
   const settingsBtn = document.getElementById('settingsBtn')
+  const saveSummaryBtn = document.getElementById('saveSummary')
+
+  // Modal elements
+  const saveModal = document.getElementById('saveModal')
+  const closeModal = document.getElementById('closeModal')
+  const cancelSave = document.getElementById('cancelSave')
+  const confirmSave = document.getElementById('confirmSave')
+  const bookTitle = document.getElementById('bookTitle')
+  const chapterTitle = document.getElementById('chapterTitle')
+  const notes = document.getElementById('notes')
+  const tags = document.getElementById('tags')
 
   console.log('🚀 ~ DOM elements:', {
     summarizeBtn,
@@ -22,11 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (summarizeBtn) {
     summarizeBtn.addEventListener('click', handleSummarize)
   }
-  
+
   if (copySummaryBtn) {
     copySummaryBtn.addEventListener('click', handleCopySummary)
   }
-  
+
+  if (saveSummaryBtn) {
+    saveSummaryBtn.addEventListener('click', openSaveModal)
+  }
+
   if (settingsBtn) {
     settingsBtn.addEventListener('click', async () => {
       console.log('🚀 ~ Settings button clicked')
@@ -53,6 +68,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
   } else {
     console.error('🚀 ~ Settings button not found')
+  }
+
+  // Modal event listeners
+  if (closeModal) {
+    closeModal.addEventListener('click', closeSaveModal)
+  }
+
+  if (cancelSave) {
+    cancelSave.addEventListener('click', closeSaveModal)
+  }
+
+  if (confirmSave) {
+    confirmSave.addEventListener('click', handleSaveSummary)
+  }
+
+  // Close modal when clicking outside
+  if (saveModal) {
+    saveModal.addEventListener('click', (e) => {
+      if (e.target === saveModal) {
+        closeSaveModal()
+      }
+    })
   }
 
   // Clear summary section on startup
@@ -236,6 +273,80 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       summarizeBtn.textContent = '📝 Summarize Current Page'
       summarizeBtn.disabled = false
+    }
+  }
+
+  // Open save modal
+  function openSaveModal() {
+    if (saveModal) {
+      saveModal.style.display = 'flex'
+      // Auto-fill book title from current tab
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0] && bookTitle) {
+          const tabTitle = tabs[0].title
+          if (tabTitle && !tabTitle.includes('Readmoo')) {
+            bookTitle.value = tabTitle
+          }
+        }
+      })
+    }
+  }
+
+  // Close save modal
+  function closeSaveModal() {
+    if (saveModal) {
+      saveModal.style.display = 'none'
+      // Clear form
+      if (bookTitle) bookTitle.value = ''
+      if (chapterTitle) chapterTitle.value = ''
+      if (notes) notes.value = ''
+      if (tags) tags.value = ''
+    }
+  }
+
+  // Handle save summary
+  async function handleSaveSummary() {
+    try {
+      const summary = summaryContent.textContent
+      if (!summary) {
+        showNotification('No summary to save', 'error')
+        return
+      }
+
+      const summaryData = {
+        id: Date.now().toString(),
+        summary,
+        bookTitle: bookTitle.value.trim(),
+        chapterTitle: chapterTitle.value.trim(),
+        notes: notes.value.trim(),
+        tags: tags.value
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag),
+        url: (await chrome.tabs.query({ active: true, currentWindow: true }))[0].url,
+        timestamp: Date.now(),
+        createdAt: new Date().toISOString()
+      }
+
+      // Get existing saved summaries
+      const { savedSummaries = [] } = await chrome.storage.local.get('savedSummaries')
+
+      // Add new summary
+      savedSummaries.unshift(summaryData)
+
+      // Keep only last 100 summaries
+      if (savedSummaries.length > 100) {
+        savedSummaries.splice(100)
+      }
+
+      // Save to storage
+      await chrome.storage.local.set({ savedSummaries })
+
+      showNotification('Summary saved successfully!', 'success')
+      closeSaveModal()
+    } catch (error) {
+      console.error('Save error:', error)
+      showNotification('Failed to save summary', 'error')
     }
   }
 

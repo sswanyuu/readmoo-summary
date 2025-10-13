@@ -40,6 +40,53 @@
       </main>
     </div>
 
+    <!-- Save Summary Modal -->
+    <div id="saveModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>💾 Save Summary</h3>
+          <button id="closeModal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="bookTitle">Book Title:</label>
+            <input type="text" id="bookTitle" class="form-input" placeholder="Enter book title" />
+          </div>
+          <div class="form-group">
+            <label for="chapterTitle">Chapter/Page:</label>
+            <input
+              type="text"
+              id="chapterTitle"
+              class="form-input"
+              placeholder="Enter chapter or page title"
+            />
+          </div>
+          <div class="form-group">
+            <label for="notes">Notes:</label>
+            <textarea
+              id="notes"
+              class="form-textarea"
+              placeholder="Add your personal notes..."
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="tags">Tags (comma separated):</label>
+            <input
+              type="text"
+              id="tags"
+              class="form-input"
+              placeholder="e.g., important, review, key-concepts"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelSave" class="secondary-btn">Cancel</button>
+          <button id="confirmSave" class="primary-btn">💾 Save Summary</button>
+        </div>
+      </div>
+    </div>
+
     <script src="popup.js"></script>
   </body>
 </html>

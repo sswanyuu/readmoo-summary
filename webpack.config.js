@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production'
-  
+
   return {
     entry: {
       background: './src/background.js',
@@ -32,10 +32,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
         },
         {
           test: /\.(png|jpg|jpeg|gif|svg)$/,
@@ -69,6 +66,10 @@ module.exports = (env, argv) => {
           {
             from: 'src/content.css',
             to: 'content.css'
+          },
+          {
+            from: 'src/styles.css',
+            to: 'styles.css'
           },
           {
             from: 'src/options.html',
