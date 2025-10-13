@@ -21,13 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const notes = document.getElementById('notes')
   const tags = document.getElementById('tags')
 
-  console.log('🚀 ~ DOM elements:', {
-    summarizeBtn,
-    summarySection,
-    summaryContent,
-    copySummaryBtn,
-    settingsBtn
-  })
+  // DOM elements loaded
 
   // Event listeners
   if (summarizeBtn) {
@@ -97,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (summaryContent && summarySection) {
       summaryContent.textContent = ''
       summarySection.style.display = 'none'
-      console.log('🚀 ~ clearSummary ~ summary section cleared')
+      // Summary section cleared
     }
   }
 
@@ -178,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to extract content (runs in page context)
   function extractPageContent() {
-    console.log('🚀 ~ extractPageContent ~ running in page context')
+    // Extracting page content
 
     // Try to find main content areas with more specific selectors for Readmoo
     const selectors = [
@@ -204,8 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           !text.includes('Google Tag Manager') &&
           !text.includes('facebook-jssdk')
         ) {
-          console.log('🚀 ~ extractPageContent ~ found content with selector:', selector)
-          console.log('🚀 ~ extractPageContent ~ content preview:', text.substring(0, 200))
+          // Content found with selector
           return text
         }
       }
@@ -213,11 +206,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fallback to body content but filter out scripts
     const bodyContent = document.body.textContent.trim()
-    console.log('🚀 ~ extractPageContent ~ body content length:', bodyContent.length)
+    // Using body content as fallback
 
     // Filter out common tracking scripts
     if (bodyContent.includes('FB.init') || bodyContent.includes('Google Tag Manager')) {
-      console.log('🚀 ~ extractPageContent ~ filtered out tracking content')
+      // Filtered out tracking content
       return null
     }
 
@@ -226,9 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Show summary in popup
   function showSummary(summary) {
-    console.log('🚀 ~ showSummary ~ summary:', summary)
-    console.log('🚀 ~ showSummary ~ summaryContent:', summaryContent)
-    console.log('🚀 ~ showSummary ~ summarySection:', summarySection)
+    // Displaying summary
 
     if (!summaryContent) {
       console.error('🚀 ~ showSummary ~ summaryContent element not found')
@@ -243,9 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       summaryContent.textContent = summary
       summarySection.style.display = 'block'
-      console.log('🚀 ~ showSummary ~ summary displayed successfully')
-      console.log('🚀 ~ showSummary ~ summarySection display:', summarySection.style.display)
-      console.log('🚀 ~ showSummary ~ summaryContent text:', summaryContent.textContent)
+      // Summary displayed successfully
 
       // Scroll to summary section
       summarySection.scrollIntoView({ behavior: 'smooth' })
