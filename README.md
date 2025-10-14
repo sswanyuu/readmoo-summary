@@ -17,10 +17,12 @@ A Chrome Extension v3 that provides intelligent content summarization for Readmo
 ## Demo
 
 - Create summary with extension, using Chrome's built-in AI Summarizer
+  
 https://github.com/user-attachments/assets/db58abad-c34f-4f33-a96a-2bd482a10b5f
 
 
 - Summary Management
+  
 https://github.com/user-attachments/assets/c7c422f9-193f-4140-a4a2-4c92aaeb2c5a
 
 
