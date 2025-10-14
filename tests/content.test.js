@@ -12,13 +12,11 @@ describe('Content Script', () => {
     `
     
     // Mock location
-    Object.defineProperty(window, 'location', {
-      value: {
-        hostname: 'readmoo.com',
-        href: 'https://readmoo.com/book/123'
-      },
-      writable: true
-    })
+    delete window.location
+    window.location = {
+      hostname: 'readmoo.com',
+      href: 'https://readmoo.com/book/123'
+    }
   })
 
   test('should extract page content', () => {

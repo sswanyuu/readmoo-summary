@@ -7,8 +7,22 @@
           "chrome": "88",
           "firefox": "78"
         },
-        "modules": false
+        "modules": "auto"
       }
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    }
+  }
 }

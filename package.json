@@ -54,6 +54,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "html-webpack-plugin": "^5.5.3",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.2.0",
     "mini-css-extract-plugin": "^2.7.6",
     "prettier": "^3.6.2",
     "rimraf": "^5.0.5",
@@ -80,6 +81,13 @@
     ],
     "testMatch": [
       "<rootDir>/tests/**/*.test.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": ["js", "json"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(webextension-polyfill)/)"
     ]
   },
   "webExt": {
