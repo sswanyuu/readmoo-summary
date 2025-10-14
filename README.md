@@ -14,7 +14,7 @@ A Chrome Extension v3 that provides intelligent content summarization for Readmo
 - 📤 **Export Function**: Export all summaries to JSON format
 - 🌐 **Multi-language Support**: Automatic language detection and appropriate response language
 
-
+## Demo
 
 - Create summary with extension, using Chrome's built-in AI Summarizer
 https://github.com/user-attachments/assets/db58abad-c34f-4f33-a96a-2bd482a10b5f
