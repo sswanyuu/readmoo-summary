@@ -17,7 +17,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Store the latest request details for manual processing
 let latestRequestDetails = null
 
-// Store current summary to avoid re-processing same content (removed for MVP)
+// Store current summary to avoid re-processing same content
+// eslint-disable-next-line no-unused-vars
+let currentSummary = null
+// eslint-disable-next-line no-unused-vars
+let currentSummaryUrl = null
 
 // Handle summarization logic (manual trigger from popup)
 async function handleSummarization(content, sendResponse, summaryLength = 'medium') {

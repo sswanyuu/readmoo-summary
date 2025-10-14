@@ -11,7 +11,7 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'no-console': 'warn',
+    'no-console': 'off', // Allow console statements in Chrome extensions for debugging
     'no-unused-vars': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
