@@ -14,6 +14,18 @@ A Chrome Extension v3 that provides intelligent content summarization for Readmo
 - 📤 **Export Function**: Export all summaries to JSON format
 - 🌐 **Multi-language Support**: Automatic language detection and appropriate response language
 
+
+
+- Create summary with extension, using Chrome's built-in AI Summarizer
+https://github.com/user-attachments/assets/db58abad-c34f-4f33-a96a-2bd482a10b5f
+
+
+- Summary Management
+https://github.com/user-attachments/assets/c7c422f9-193f-4140-a4a2-4c92aaeb2c5a
+
+
+
+
 ## 🚀 Installation
 
 ### Prerequisites
@@ -250,15 +262,14 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🗺️ Roadmap
 
-- [ ] Batch summarization for multiple pages
 - [ ] Advanced content filtering options
 - [ ] Summary search and filtering
-- [ ] Integration with external note-taking apps
 - [ ] Advanced export formats (PDF, Markdown)
 - [ ] Summary sharing features
 - [ ] Analytics and usage insights
 - [ ] Dark mode theme
 - [ ] Keyboard shortcuts
+- [ ] Integration with external note-taking apps
 
 ---
 
