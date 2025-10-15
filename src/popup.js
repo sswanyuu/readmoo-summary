@@ -100,6 +100,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function handleSummarize() {
     try {
       setLoading(true)
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      })
       if (!tab.url.includes('readmoo.com')) {
         showNotification('Please navigate to a Readmoo page first', 'error')
         setLoading(false)
@@ -108,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const response = await chrome.runtime.sendMessage({
         action: 'summarize',
-        summaryLength
+        summaryLength: summaryLengthSelect.value,
       })
 
       if (response && response.success) {

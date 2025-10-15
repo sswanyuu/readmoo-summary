@@ -11,9 +11,14 @@ class SummaryResult {
     return this.url === this.latestRequestDetails.url
   }
 
+  updateSummary(summary) {
+    this.summary = summary
+    this.url = this.latestRequestDetails.url
+  }
+
   async summarize(summaryLength = 'medium') {
     this.summary = await handleSummarization(summaryLength, this.latestRequestDetails.url)
-    this.url = this.latestRequestDetails.url
+    this.url = this.latestRequestDetails?.url
   }
 }
 
@@ -25,7 +30,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   switch (request.action) {
     case 'summarize':
       try {
-        const summary = await handleSummarization(request.summaryLength, request.url)
+        const summary = await handleSummarization(request.summaryLength)
         sendResponse({ success: true, summary })
       } catch (error) {
         sendResponse({ success: false, error: error.message })
@@ -37,7 +42,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 })
 
 // Handle summarization logic (manual triggered from popup)
-async function handleSummarization(summaryLength = 'medium', url) {
+async function handleSummarization(summaryLength = 'medium') {
+  console.log("🚀🚀🚀 ~~~ ~ background.js:46 ~ handleSummarization ~ summaryLength:", summaryLength);
   try {
     // Check API availability
     if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
@@ -50,10 +56,14 @@ async function handleSummarization(summaryLength = 'medium', url) {
       return summaryResult.summary
     }
 
-    // Skip if content is too short
+    const res = await fetch(summaryResult.latestRequestDetails.url)
+    const html = await res.text()
+
+    const contentToUse = extractTextFromHTML(html)
     if (contentToUse.length < 100) {
-      throw new Error('Content too short')
+      return contentToUse
     }
+    
 
     const options = {
       type: 'key-points',
@@ -100,8 +110,8 @@ async function handleSummarization(summaryLength = 'medium', url) {
     })
 
     const summary = await summarizer.summarize(truncatedText)
-
-    sendResponse({ success: true, summary })
+    summaryResult.updateSummary(summary)
+    return summary;
   } catch (error) {
     console.error('❌ Summarization failed:', error.message)
     throw new Error(error.message)
