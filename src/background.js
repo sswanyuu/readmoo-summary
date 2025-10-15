@@ -31,19 +31,22 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     case 'summarize':
       try {
         const summary = await handleSummarization(request.summaryLength)
+        console.log("🚀🚀🚀 ~~~ ~ background.js:34 ~ summary:", summary);
         sendResponse({ success: true, summary })
+        return true;
       } catch (error) {
+        console.log("🚀🚀🚀 ~~~ ~ background.js:36 ~ error:", error);
         sendResponse({ success: false, error: error.message })
       }
       return true
     default:
+      console.log("🚀🚀🚀 ~~~ ~ background.js:42 ~ Unknown action:", request.action);
       sendResponse({ error: 'Unknown action' })
   }
 })
 
 // Handle summarization logic (manual triggered from popup)
 async function handleSummarization(summaryLength = 'medium') {
-  console.log("🚀🚀🚀 ~~~ ~ background.js:46 ~ handleSummarization ~ summaryLength:", summaryLength);
   try {
     // Check API availability
     if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
@@ -110,6 +113,7 @@ async function handleSummarization(summaryLength = 'medium') {
     })
 
     const summary = await summarizer.summarize(truncatedText)
+    console.log("🚀🚀🚀 ~~~ ~ background.js:113 ~ handleSummarization ~ summary:", summary);
     summaryResult.updateSummary(summary)
     return summary;
   } catch (error) {
