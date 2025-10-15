@@ -8,9 +8,7 @@
     "build:dev": "webpack --mode=development",
     "watch": "webpack --mode=development --watch",
     "clean": "rimraf dist",
-    "icons": "node scripts/create-icons.js",
     "prebuild": "npm run clean",
-    "postinstall": "npm run icons",
     "dev": "npm run build:dev && npm run watch",
     "package": "npm run build && web-ext build",
     "lint": "eslint src/**/*.js",
@@ -85,7 +83,10 @@
     "transform": {
       "^.+\\.js$": "babel-jest"
     },
-    "moduleFileExtensions": ["js", "json"],
+    "moduleFileExtensions": [
+      "js",
+      "json"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(webextension-polyfill)/)"
     ]

@@ -10,7 +10,7 @@ describe('Content Script', () => {
         <p>This is a test article content for summarization.</p>
       </article>
     `
-    
+
     // Mock location
     delete window.location
     window.location = {
@@ -22,27 +22,27 @@ describe('Content Script', () => {
   test('should extract page content', () => {
     const extractPageContent = () => {
       const selectors = ['article', '.content', '.main-content']
-      
+
       for (const selector of selectors) {
         const element = document.querySelector(selector)
         if (element && element.textContent.trim().length > 10) {
           return {
             text: element.textContent.trim(),
             html: element.innerHTML,
-            selector: selector
+            selector
           }
         }
       }
-      
+
       return {
         text: document.body.textContent.trim(),
         html: document.body.innerHTML,
         selector: 'body'
       }
     }
-    
+
     const result = extractPageContent()
-    
+
     expect(result.text).toContain('Test Article')
     expect(result.selector).toBe('article')
   })
@@ -51,9 +51,9 @@ describe('Content Script', () => {
     const mockRequest = {
       action: 'getPageContent'
     }
-    
+
     const mockSendResponse = jest.fn()
-    
+
     // Simulate message handling
     const handleMessage = (request, sender, sendResponse) => {
       if (request.action === 'getPageContent') {
@@ -62,12 +62,12 @@ describe('Content Script', () => {
           html: document.body.innerHTML,
           selector: 'body'
         }
-        sendResponse({ content: content })
+        sendResponse({ content })
       }
     }
-    
+
     handleMessage(mockRequest, {}, mockSendResponse)
-    
+
     expect(mockSendResponse).toHaveBeenCalledWith({
       content: expect.objectContaining({
         text: expect.any(String),
