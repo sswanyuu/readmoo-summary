@@ -1,288 +1,127 @@
+
 # Readmoo Summary Chrome Extension
 
-A Chrome Extension v3 that provides intelligent content summarization for Readmoo pages using Chrome's built-in AI APIs. This extension helps users quickly understand and digest content from Readmoo by generating concise summaries with customizable length options.
+A Chrome Extension (v3) that provides AI-powered content summarization for Readmoo pages using Chrome’s built-in Summarizer and LanguageDetector APIs. It helps users quickly digest book content with concise, customizable summaries.
+
+---
 
 ## ✨ Features
+- 🤖 **AI-Powered Summaries** – Uses Chrome’s built-in Summarizer and LanguageDetector APIs  
+- 📝 **On-Demand Summarization** – Click to generate summaries instantly  
+- 🎯 **Smart Content Extraction** – Automatically detects and extracts Readmoo content  
+- 📏 **Adjustable Length** – Short (3 points), Medium (5), or Long (7)  
+- 💾 **Save & Manage Summaries** – Add notes, tags, and metadata; edit or delete anytime  
+- 📤 **Export to JSON** – Export all summaries with one click  
+- 🌐 **Multi-Language Support** – Auto-detects content language and responds accordingly  
 
-- 🤖 **Chrome AI Integration**: Uses Chrome's built-in Summarizer and LanguageDetector APIs
-- 📝 **Manual Summarization**: Click to generate summaries on demand
-- 🎯 **Smart Content Extraction**: Automatically extracts content from Readmoo pages
-- 📏 **Adjustable Length**: Choose between Short (3 points), Medium (5 points), or Long (7 points)
-- 💾 **Save Summaries**: Store summaries with custom notes, tags, and metadata
-- 🏷️ **Tag System**: Organize summaries with custom tags
-- 📚 **Summary Management**: View, edit, and delete saved summaries
-- 📤 **Export Function**: Export all summaries to JSON format
-- 🌐 **Multi-language Support**: Automatic language detection and appropriate response language
+---
 
-## Demo
+## 🎬 Demo
 
-- Create summary with extension, using Chrome's built-in AI Summarizer
-  
+**Generate summaries using Chrome’s built-in AI Summarizer:**
 
+https://github.com/user-attachments/assets/96113429-283b-4959-97d0-a9e8aae29bb3  
 
-https://github.com/user-attachments/assets/96113429-283b-4959-97d0-a9e8aae29bb3
+**Manage and organize saved summaries:**
 
+https://github.com/user-attachments/assets/ba4eaeaa-9044-4cc5-b004-469ec55f4fdc  
 
-
-
-- Summary Management
-  
-
-
-
-https://github.com/user-attachments/assets/ba4eaeaa-9044-4cc5-b004-469ec55f4fdc
-
-
-
-
-
-
+---
 
 ## 🚀 Installation
-
-### Prerequisites
-
-- Node.js 16+ and npm 8+
-- Chrome browser (version 88+)
-- Chrome with AI features enabled (Chrome 126+)
-
-### Development Setup
-
-1. **Clone the repository**
+1. **Clone & Install**
 
    ```bash
-   git clone <repository-url>
+   git clone <repo-url>
    cd readmoo-summary-extension
-   ```
-
-2. **Install dependencies**
-
-   ```bash
    npm install
    ```
-
-3. **Build the extension**
+2. **Build**
 
    ```bash
    npm run build
    ```
+3. **Load in Chrome**
 
-4. **Load the extension in Chrome**
-   - Open Chrome and navigate to `chrome://extensions/`
-   - Enable "Developer mode" in the top right corner
-   - Click "Load unpacked" and select the `dist/` folder
-   - The extension should now appear in your extensions list
+   * Open `chrome://extensions/`
+   * Enable *Developer mode* → *Load unpacked* → select the `dist/` folder
+4. **Test**
 
-5. **Test the extension**
-   - Navigate to a Readmoo page (e.g., `https://readmoo.com/book/...`)
-   - Click the extension icon in Chrome's toolbar
-   - Click "📝 Summarize Current Page" to generate a summary
+   * Visit a Readmoo page → click the extension → choose summary length → click “📝 Summarize”
 
-### Development Workflow
-
-```bash
-# Install dependencies
-npm install
-
-# Development build with watch mode
-npm run dev
-
-# Production build
-npm run build
-
-# Run tests
-npm test
-
-# Run linter
-npm run lint
-
-# Clean build directory
-npm run clean
-```
+---
 
 ## 📖 Usage
 
-### Basic Usage
+1. Open a Readmoo page
+2. Click the extension icon
+3. Select summary length (Short / Medium / Long)
+4. Generate, view, or save the summary
+5. Manage or export summaries from Settings
 
-1. **Navigate to a Readmoo page** (e.g., `https://readmoo.com/book/...`)
-2. **Click the extension icon** in your browser toolbar
-3. **Select summary length** (Short/Medium/Long)
-4. **Click "📝 Summarize Current Page"** to generate a summary
-5. **View the summary** in the popup
-6. **Copy or save** the summary as needed
-
-### Saving Summaries
-
-1. **Click "💾 Save"** after generating a summary
-2. **Fill in the details**:
-   - Book Title (auto-filled from page title)
-   - Chapter/Page title
-   - Personal notes
-   - Tags (comma-separated)
-3. **Click "💾 Save Summary"** to store it
-
-### Managing Saved Summaries
-
-1. **Click "⚙️ Settings"** in the popup
-2. **View all saved summaries** in the "Saved Summaries" section
-3. **Use action buttons**:
-   - 📋 Copy: Copy summary to clipboard
-   - 👁️ View: View full summary in modal
-   - 🗑️ Delete: Remove summary
-4. **Export all summaries** using the "📤 Export" button
+---
 
 ## 🏗️ File Structure
 
 ```
-readmoo-summary-extension/
-├── src/                   # Source files
-│   ├── manifest.json      # Extension manifest (v3)
-│   ├── background.js      # Service worker script
-│   ├── popup.html         # Extension popup interface
-│   ├── popup.css          # Popup styles
-│   ├── popup.js           # Popup functionality
-│   ├── content.js         # Content script for page interaction
-│   ├── content.css        # Content script styles
-│   ├── options.html       # Options/settings page
-│   ├── options.css        # Options page styles
-│   ├── options.js         # Options page functionality
-│   ├── styles.css         # Shared CSS variables and utilities
-│   └── icons/             # Extension icons (16px, 32px, 48px, 128px)
-├── dist/                  # Built extension (generated)
-├── tests/                 # Test files
-├── package.json          # NPM package configuration
-├── webpack.config.js     # Webpack build configuration
-├── .eslintrc.js          # ESLint configuration
-├── .babelrc              # Babel configuration
-├── .gitignore            # Git ignore rules
-└── README.md             # This file
+src/
+ ├── manifest.json
+ ├── background.js
+ ├── popup.{html,css,js}
+ ├── content.{js,css}
+ ├── options.{html,css,js}
+ └── icons/
 ```
-
-## ⚙️ Configuration
-
-### Settings Available
-
-- **Default Summary Length**: Set default length (Short/Medium/Long)
-- **Minimum Content Length**: Set minimum characters for summarization
-
-### Chrome AI API Requirements
-
-The extension uses Chrome's built-in AI APIs:
-
-- **Summarizer API**: For generating summaries
-- **LanguageDetector API**: For automatic language detection
-- **Chrome 126+**: Required for AI features
-- **No API keys needed**: Uses Chrome's built-in capabilities
-
-## 🛠️ Development
-
-### Prerequisites
-
-- Node.js 16+ and npm 8+
-- Chrome browser (version 126+)
-- Chrome with AI features enabled
-- Basic knowledge of JavaScript, HTML, and CSS
-
-### Building and Testing
-
-1. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-2. **Start development mode**
-
-   ```bash
-   npm run dev
-   ```
-
-3. **Make changes** to the source files in the `src/` directory
-4. **Reload the extension** in `chrome://extensions/`
-5. **Test functionality** on Readmoo pages
-
-### Available Scripts
-
-- `npm run build` - Production build
-- `npm run dev` - Development build with watch
-- `npm run clean` - Clean build directory
-- `npm run lint` - Run ESLint
-- `npm test` - Run tests
-
-### Debugging
-
-- **Extension Console**: Use Chrome DevTools on the extension pages
-- **Content Script Console**: Check the page console for content script logs
-- **Background Script**: Use the extension's service worker console
-- **Console Logs**: Extensive logging for debugging
-
-## 🔒 Permissions
-
-This extension requires the following permissions:
-
-- `activeTab`: Access current tab content for summarization
-- `storage`: Save user settings and summaries
-- `scripting`: Inject content scripts into pages
-- `webRequest`: Monitor page requests for content extraction
-- `https://readmoo.com/*`: Access Readmoo pages
-- `*://reader.readmoo.com/*`: Access Readmoo reader pages
-
-## 🔐 Security
-
-- **No data collection**: The extension doesn't collect or transmit personal data
-- **Local storage**: Settings and summaries are stored locally using Chrome storage API
-- **Chrome AI APIs**: Uses Chrome's built-in, secure AI capabilities
-- **Minimal permissions**: Only requests necessary permissions
-
-## 🤝 Contributing
-
-1. **Fork the repository**
-2. **Create a feature branch**
-3. **Make your changes**
-4. **Test thoroughly**
-5. **Submit a pull request**
-
-### Development Guidelines
-
-- Follow Chrome Extension v3 best practices
-- Use modern JavaScript (ES6+)
-- Ensure responsive design
-- Test on multiple screen sizes
-- Validate all user inputs
-- Handle errors gracefully
-- Add appropriate console logging
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-- **Issues**: Report bugs and request features on GitHub
-- **Documentation**: Check this README for detailed guides
-- **Community**: Join discussions in the GitHub discussions section
-
-## 📈 Changelog
-
-### v1.0.0 (Current)
-
-- ✅ Chrome AI API integration
-- ✅ Manual summarization with length options
-- ✅ Save summaries with metadata
-- ✅ Summary management interface
-- ✅ Export functionality
-
-## 🗺️ Roadmap
-
-- [ ] Advanced content filtering options
-- [ ] Summary search and filtering
-- [ ] Advanced export formats (PDF, Markdown)
-- [ ] Summary sharing features
-- [ ] Analytics and usage insights
-- [ ] Dark mode theme
-- [ ] Keyboard shortcuts
-- [ ] Integration with external note-taking apps
 
 ---
 
-**Note**: This extension is designed specifically for Readmoo.com content and requires Chrome 126+ with AI features enabled. For best results, ensure you're on a valid Readmoo page when using the summarization features.
+## ⚙️ Development
+
+```bash
+npm run dev     # Watch mode
+npm run build   # Production build
+npm run test    # Run tests
+npm run lint    # Lint code
+npm run clean   # Clean build folder
+```
+
+### Requirements
+
+* Node.js 16+
+* Chrome 126+ with AI features enabled
+
+---
+
+## 🔒 Permissions
+
+* `activeTab`, `storage`, `scripting`, `webRequest`
+* `https://readmoo.com/*`, `*://reader.readmoo.com/*`
+
+> All data is stored locally — no external collection or transmission.
+
+---
+
+## 🤝 Contributing
+
+1. Fork and create a feature branch
+2. Make changes and test thoroughly
+3. Submit a pull request
+
+---
+
+## 📜 License
+
+MIT License
+
+---
+
+## 🗺️ Roadmap
+
+* [ ] Summary search and filters
+* [ ] Advanced export formats (PDF, Markdown)
+* [ ] Dark mode and keyboard shortcuts
+* [ ] Integration with note-taking apps
+
+---
+
+**Note:** Works exclusively on Readmoo.com pages and requires Chrome 126+ with AI features enabled.
