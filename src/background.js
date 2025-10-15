@@ -2,91 +2,57 @@
 // Background service worker for Chrome Extension v3
 // This script runs in the background and handles extension lifecycle events
 
-// Handle messages from popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  switch (request.action) {
-    case 'summarizeContent':
-      handleSummarization(request.content, sendResponse, request.summaryLength)
-      return true
+class SummaryResult {
+  url = null
+  summary = null
+  latestRequestDetails = null
 
+  isSummarized() {
+    return this.url === this.latestRequestDetails.url
+  }
+
+  async summarize(summaryLength = 'medium') {
+    this.summary = await handleSummarization(summaryLength, this.latestRequestDetails.url)
+    this.url = this.latestRequestDetails.url
+  }
+}
+
+
+const summaryResult = new SummaryResult()
+
+// Handle messages from popup
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  switch (request.action) {
+    case 'summarize':
+      try {
+        const summary = await handleSummarization(request.summaryLength, request.url)
+        sendResponse({ success: true, summary })
+      } catch (error) {
+        sendResponse({ success: false, error: error.message })
+      }
+      return true
     default:
       sendResponse({ error: 'Unknown action' })
   }
 })
 
-// Store the latest request details for manual processing
-let latestRequestDetails = null
-
-// Store current summary to avoid re-processing same content
-// eslint-disable-next-line no-unused-vars
-let currentSummary = null
-// eslint-disable-next-line no-unused-vars
-let currentSummaryUrl = null
-
-// Handle summarization logic (manual trigger from popup)
-async function handleSummarization(content, sendResponse, summaryLength = 'medium') {
+// Handle summarization logic (manual triggered from popup)
+async function handleSummarization(summaryLength = 'medium', url) {
   try {
     // Check API availability
     if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
-      console.log('❌ Summarizer API or LanguageDetector API not supported')
-      sendResponse({ success: false, error: 'API not supported' })
-      return
+      console.error('Summarizer API or LanguageDetector API not supported')
+      throw new Error('API not supported');
     }
 
     // Check if we already have a summary for the current content
-    // if (latestRequestDetails && currentSummary && currentSummaryUrl === latestRequestDetails.url) {
-    //   console.log('🚀 ~ handleSummarization ~ using cached summary for:', latestRequestDetails.url)
-    //   sendResponse({ success: true, summary: currentSummary })
-    //   return
-    // }
-
-    // Use provided content or fetch from latest request
-    let contentToUse = content
-    let sourceUrl = null
-
-    if (!contentToUse && latestRequestDetails) {
-      console.log(
-        '🚀 ~ handleSummarization ~ fetching from latest request:',
-        latestRequestDetails.url
-      )
-      try {
-        const res = await fetch(latestRequestDetails.url)
-        const html = await res.text()
-        contentToUse = extractTextFromHTML(html)
-        sourceUrl = latestRequestDetails.url
-        console.log('🚀 ~ handleSummarization ~ fetched content length:', contentToUse.length)
-      } catch (error) {
-        console.error('❌ Failed to fetch from latest request:', error)
-      }
-    }
-
-    if (!contentToUse) {
-      console.log('❌ No content available for summarization')
-      sendResponse({ success: false, error: 'No content available' })
-      return
+    if (summaryResult.isSummarized()) {
+      return summaryResult.summary
     }
 
     // Skip if content is too short
     if (contentToUse.length < 100) {
-      console.log('⚠️ Content too short, skipping summarization')
-      sendResponse({ success: false, error: 'Content too short' })
-      return
-    }
-
-    // Filter out tracking and script content
-    if (
-      contentToUse.includes('FB.init') ||
-      contentToUse.includes('Google Tag Manager') ||
-      contentToUse.includes('facebook-jssdk') ||
-      contentToUse.includes('GTM-') ||
-      contentToUse.includes('dataLayer')
-    ) {
-      console.log('🚀 ~ filtered out tracking content')
-      sendResponse({
-        success: false,
-        error: 'Content contains tracking scripts, not suitable for summarization'
-      })
-      return
+      throw new Error('Content too short')
     }
 
     const options = {
@@ -97,16 +63,14 @@ async function handleSummarization(content, sendResponse, summaryLength = 'mediu
 
     const availability = await Summarizer.availability()
     if (availability === 'unavailable') {
-      console.log("❌ The Summarizer API isn't usable.")
-      sendResponse({ success: false, error: 'API unavailable' })
-      return
+      console.error("The Summarizer API isn't usable.")
+      throw new Error('API unavailable')
     }
 
     const languageDetectorAvailability = await LanguageDetector.availability()
     if (languageDetectorAvailability === 'unavailable') {
-      console.log("❌ The LanguageDetector API isn't usable.")
-      sendResponse({ success: false, error: 'Language Detector unavailable' })
-      return
+      console.error("The LanguageDetector API isn't usable.")
+      throw new Error('Language Detector unavailable')
     }
 
     // Truncate to fit API limits (roughly 20,000 characters)
@@ -122,6 +86,7 @@ async function handleSummarization(content, sendResponse, summaryLength = 'mediu
     })
     const results = await detector.detect(truncatedText)
 
+    // TODO: Extract sumarizer and reuse constant
     const summarizer = await Summarizer.create({
       type: options.type,
       format: options.format,
@@ -136,19 +101,14 @@ async function handleSummarization(content, sendResponse, summaryLength = 'mediu
 
     const summary = await summarizer.summarize(truncatedText)
 
-    // Cache the current summary
-    currentSummary = summary
-    currentSummaryUrl = sourceUrl
-
-    console.log('✅ Summary generated successfully')
     sendResponse({ success: true, summary })
   } catch (error) {
     console.error('❌ Summarization failed:', error.message)
-    sendResponse({ success: false, error: error.message })
+    throw new Error(error.message)
   }
 }
 
-// Helper function to extract text from HTML (Service Worker compatible)
+// Helper function to extract text from HTML
 function extractTextFromHTML(html) {
   // Remove script and style tags with their content
   let text = html
@@ -187,9 +147,7 @@ chrome.webRequest.onCompleted.addListener(
       return
     }
 
-    // Store the latest request details (don't process immediately)
-    latestRequestDetails = details
-    console.log('🚀 ~ stored latest request:', details.url)
+    summaryResult.latestRequestDetails = details
   },
   { urls: ['*://reader.readmoo.com/e/*'] }
 )

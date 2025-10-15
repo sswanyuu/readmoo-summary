@@ -1,7 +1,5 @@
 // Popup script for Chrome Extension
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 ~ DOMContentLoaded ~ popup script starting')
-
   // Get DOM elements
   const summarizeBtn = document.getElementById('summarizeBtn')
   const summarySection = document.getElementById('summarySection')
@@ -102,45 +100,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function handleSummarize() {
     try {
       setLoading(true)
-
-      // Get current tab
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
-      })
-
       if (!tab.url.includes('readmoo.com')) {
         showNotification('Please navigate to a Readmoo page first', 'error')
         setLoading(false)
         return
       }
 
-      // Get page content from current tab
-      const content = await getPageContent(tab.id)
-
-      if (!content) {
-        console.log('🚀 ~ handleSummarize ~ no content extracted, trying latest request')
-      }
-
-      // Get selected summary length
-      const summaryLength = summaryLengthSelect.value
-
-      // Send content for summarization to background script
-      console.log('🚀 ~ handleSummarize ~ sending message to background')
       const response = await chrome.runtime.sendMessage({
-        action: 'summarizeContent',
-        content: content || null,
+        action: 'summarize',
         summaryLength
       })
 
-      console.log('🚀 ~ handleSummarize ~ received response:', response)
-
       if (response && response.success) {
-        console.log('🚀 ~ handleSummarize ~ showing summary:', response.summary)
         showSummary(response.summary)
         showNotification('Summary generated successfully!', 'success')
       } else {
-        console.log('🚀 ~ handleSummarize ~ error response:', response)
         showNotification(
           `Failed to generate summary: ${response?.error || 'Unknown error'}`,
           'error'
@@ -154,96 +128,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Get page content from current tab
-  async function getPageContent(tabId) {
-    try {
-      const results = await chrome.scripting.executeScript({
-        target: { tabId },
-        function: extractPageContent
-      })
-
-      console.log('🚀 ~ getPageContent ~ results:', results)
-      return results[0]?.result || null
-    } catch (error) {
-      console.error('Failed to extract content:', error)
-      return null
-    }
-  }
-
-  // Function to extract content (runs in page context)
-  function extractPageContent() {
-    // Extracting page content
-
-    // Try to find main content areas with more specific selectors for Readmoo
-    const selectors = [
-      '.reader-content',
-      '.book-content',
-      '.chapter-content',
-      '.content-body',
-      '.article-content',
-      'article',
-      '.main-content',
-      '.content',
-      'main',
-      '.post-content'
-    ]
-
-    for (const selector of selectors) {
-      const element = document.querySelector(selector)
-      if (element && element.textContent.trim().length > 100) {
-        // Filter out script and style content
-        const text = element.textContent.trim()
-        if (
-          !text.includes('FB.init') &&
-          !text.includes('Google Tag Manager') &&
-          !text.includes('facebook-jssdk')
-        ) {
-          // Content found with selector
-          return text
-        }
-      }
-    }
-
-    // Fallback to body content but filter out scripts
-    const bodyContent = document.body.textContent.trim()
-    // Using body content as fallback
-
-    // Filter out common tracking scripts
-    if (bodyContent.includes('FB.init') || bodyContent.includes('Google Tag Manager')) {
-      // Filtered out tracking content
-      return null
-    }
-
-    return bodyContent
-  }
-
-  // Show summary in popup
   function showSummary(summary) {
-    // Displaying summary
-
-    if (!summaryContent) {
-      console.error('🚀 ~ showSummary ~ summaryContent element not found')
-      return
-    }
-
-    if (!summarySection) {
-      console.error('🚀 ~ showSummary ~ summarySection element not found')
-      return
-    }
-
-    try {
       summaryContent.textContent = summary
       summarySection.style.display = 'block'
-      // Summary displayed successfully
-
-      // Scroll to summary section
       summarySection.scrollIntoView({ behavior: 'smooth' })
-    } catch (error) {
-      console.error('🚀 ~ showSummary ~ error:', error)
-    }
   }
 
-  // Handle copy summary
   async function handleCopySummary() {
     try {
       await navigator.clipboard.writeText(summaryContent.textContent)
@@ -254,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Set loading state
   function setLoading(loading) {
     if (loading) {
       summarizeBtn.textContent = 'Summarizing...'
@@ -265,11 +154,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Open save modal
   function openSaveModal() {
     if (saveModal) {
       saveModal.style.display = 'flex'
-      // Auto-fill book title from current tab
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0] && bookTitle) {
           const tabTitle = tabs[0].title
