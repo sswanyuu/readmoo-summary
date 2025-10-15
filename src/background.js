@@ -26,22 +26,19 @@ class SummaryResult {
 const summaryResult = new SummaryResult()
 
 // Handle messages from popup
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
     case 'summarize':
-      try {
-        const summary = await handleSummarization(request.summaryLength)
-        console.log("🚀🚀🚀 ~~~ ~ background.js:34 ~ summary:", summary);
-        sendResponse({ success: true, summary })
-        return true;
-      } catch (error) {
-        console.log("🚀🚀🚀 ~~~ ~ background.js:36 ~ error:", error);
-        sendResponse({ success: false, error: error.message })
-      }
+      handleSummarization(request.summaryLength)
+        .then(summary => {
+          return sendResponse({ success: true, summary })
+        }).catch(error => {
+          return sendResponse({ success: false, error: error.message });
+        })
       return true
     default:
       console.log("🚀🚀🚀 ~~~ ~ background.js:42 ~ Unknown action:", request.action);
-      sendResponse({ error: 'Unknown action' })
+      return sendResponse({ error: 'Unknown action' });
   }
 })
 
@@ -66,7 +63,7 @@ async function handleSummarization(summaryLength = 'medium') {
     if (contentToUse.length < 100) {
       return contentToUse
     }
-    
+
 
     const options = {
       type: 'key-points',
