@@ -20,11 +20,19 @@ A Chrome Extension (v3) that provides AI-powered content summarization for Readm
 
 **Generate summaries using Chrome’s built-in AI Summarizer:**
 
-https://github.com/user-attachments/assets/96113429-283b-4959-97d0-a9e8aae29bb3  
+
+
+https://github.com/user-attachments/assets/08e38d7f-a06a-4d99-8f10-7e92f1b175ae
+
+
 
 **Manage and organize saved summaries:**
 
-https://github.com/user-attachments/assets/ba4eaeaa-9044-4cc5-b004-469ec55f4fdc  
+
+
+https://github.com/user-attachments/assets/3f87466d-d40e-4dc5-9b30-e64355abf35f
+
+
 
 ---
 
