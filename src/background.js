@@ -8,12 +8,12 @@ class SummaryResult {
   latestRequestDetails = null
 
   isSummarized() {
-    return this.url === this.latestRequestDetails.url
+    return this.url === this.latestRequestDetails?.url
   }
 
   updateSummary(summary) {
     this.summary = summary
-    this.url = this.latestRequestDetails.url
+    this.url = this.latestRequestDetails?.url
   }
 
   async summarize(summaryLength = 'medium') {
@@ -101,7 +101,7 @@ async function handleSummarization(summaryLength = 'medium') {
       type: options.type,
       format: options.format,
       length: options.length,
-      sharedContext: `Please reply with language ${results[0].detectedLanguage}`,
+      sharedContext: `Please summarize with language ${results[0].detectedLanguage}`,
       monitor(m) {
         m.addEventListener('downloadprogress', (e) => {
           console.log(`📥 Downloaded ${e.loaded * 100}%`)
@@ -110,7 +110,6 @@ async function handleSummarization(summaryLength = 'medium') {
     })
 
     const summary = await summarizer.summarize(truncatedText)
-    console.log("🚀🚀🚀 ~~~ ~ background.js:113 ~ handleSummarization ~ summary:", summary);
     summaryResult.updateSummary(summary)
     return summary;
   } catch (error) {
@@ -160,5 +159,5 @@ chrome.webRequest.onCompleted.addListener(
 
     summaryResult.latestRequestDetails = details
   },
-  { urls: ['*://reader.readmoo.com/e/*'] }
+  { urls: ['*://reader.readmoo.com/*'] }
 )

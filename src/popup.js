@@ -152,9 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loading) {
       summarizeBtn.textContent = 'Summarizing...'
       summarizeBtn.disabled = true
+      summaryLengthSelect.disabled = true
     } else {
       summarizeBtn.textContent = '📝 Summarize Current Page'
       summarizeBtn.disabled = false
+      summaryLengthSelect.disabled = false
     }
   }
 
