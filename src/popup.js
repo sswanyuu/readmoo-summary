@@ -41,25 +41,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Try chrome.runtime.openOptionsPage first
         if (chrome.runtime.openOptionsPage) {
           await chrome.runtime.openOptionsPage()
-          console.log('🚀 ~ Options page opened via openOptionsPage')
         } else {
           // Fallback to chrome.tabs.create
           await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
-          console.log('🚀 ~ Options page opened via tabs.create')
         }
       } catch (error) {
-        console.error('🚀 ~ Failed to open options page:', error)
-        // Try fallback method
         try {
           await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
-          console.log('🚀 ~ Options page opened via fallback')
         } catch (fallbackError) {
-          console.error('🚀 ~ Fallback also failed:', fallbackError)
         }
       }
     })
-  } else {
-    console.error('🚀 ~ Settings button not found')
   }
 
   // Modal event listeners
@@ -89,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (summaryContent && summarySection) {
       summaryContent.textContent = ''
       summarySection.style.display = 'none'
-      // Summary section cleared
     }
   }
 
