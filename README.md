@@ -5,6 +5,7 @@ A Chrome Extension (v3) that provides AI-powered content summarization for Readm
 
 ---
 
+
 ## ✨ Features
 - 🤖 **AI-Powered Summaries** – Uses Chrome’s built-in Summarizer and LanguageDetector APIs  
 - 📝 **On-Demand Summarization** – Click to generate summaries instantly  
@@ -15,6 +16,13 @@ A Chrome Extension (v3) that provides AI-powered content summarization for Readm
 - 🌐 **Multi-Language Support** – Auto-detects content language and responds accordingly  
 
 ---
+
+- popup
+<img width="324" height="302" alt="截圖 2026-02-01 下午4 31 13" src="https://github.com/user-attachments/assets/f14239ee-7628-43d2-9ce1-2654ba8e9180" />
+
+- setup page
+<img width="1113" height="763" alt="截圖 2026-02-01 下午4 27 03" src="https://github.com/user-attachments/assets/646210dd-cba3-42d5-9f0a-0bf9195ee91f" />
+
 
 ## 🎬 Demo
 
