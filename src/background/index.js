@@ -22,7 +22,6 @@ class SummaryResult {
   }
 }
 
-
 const summaryResult = new SummaryResult()
 
 // Handle messages from popup
@@ -30,15 +29,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
     case 'summarize':
       handleSummarization(request.summaryLength)
-        .then(summary => {
+        .then((summary) => {
           return sendResponse({ success: true, summary })
-        }).catch(error => {
-          return sendResponse({ success: false, error: error.message });
+        })
+        .catch((error) => {
+          return sendResponse({ success: false, error: error.message })
         })
       return true
     default:
-      console.log("🚀🚀🚀 ~~~ ~ background.js:42 ~ Unknown action:", request.action);
-      return sendResponse({ error: 'Unknown action' });
+      console.log('🚀🚀🚀 ~~~ ~ background.js:42 ~ Unknown action:', request.action)
+      return sendResponse({ error: 'Unknown action' })
   }
 })
 
@@ -48,7 +48,7 @@ async function handleSummarization(summaryLength = 'medium') {
     // Check API availability
     if (!('Summarizer' in self) || !('LanguageDetector' in self)) {
       console.error('Summarizer API or LanguageDetector API not supported')
-      throw new Error('API not supported');
+      throw new Error('API not supported')
     }
 
     // Check if we already have a summary for the current content
@@ -63,7 +63,6 @@ async function handleSummarization(summaryLength = 'medium') {
     if (contentToUse.length < 100) {
       return contentToUse
     }
-
 
     const options = {
       type: 'key-points',
@@ -111,7 +110,7 @@ async function handleSummarization(summaryLength = 'medium') {
 
     const summary = await summarizer.summarize(truncatedText)
     summaryResult.updateSummary(summary)
-    return summary;
+    return summary
   } catch (error) {
     console.error('❌ Summarization failed:', error.message)
     throw new Error(error.message)

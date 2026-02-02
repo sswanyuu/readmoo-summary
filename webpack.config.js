@@ -1,6 +1,5 @@
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = (env, argv) => {
@@ -8,10 +7,10 @@ module.exports = (env, argv) => {
 
   return {
     entry: {
-      background: './src/background.js',
-      popup: './src/popup.js',
-      content: './src/content.js',
-      options: './src/options.js'
+      background: './src/background/index.js',
+      popup: './src/popup/index.js',
+      content: './src/content/index.js',
+      options: './src/options/index.js'
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -56,27 +55,27 @@ module.exports = (env, argv) => {
             noErrorOnMissing: true
           },
           {
-            from: 'src/popup.html',
+            from: 'src/popup/index.html',
             to: 'popup.html'
           },
           {
-            from: 'src/popup.css',
+            from: 'src/popup/index.css',
             to: 'popup.css'
           },
           {
-            from: 'src/content.css',
+            from: 'src/content/index.css',
             to: 'content.css'
           },
           {
-            from: 'src/styles.css',
+            from: 'src/shared/styles/base.css',
             to: 'styles.css'
           },
           {
-            from: 'src/options.html',
+            from: 'src/options/index.html',
             to: 'options.html'
           },
           {
-            from: 'src/options.css',
+            from: 'src/options/index.css',
             to: 'options.css'
           }
         ]

@@ -37,11 +37,12 @@ https://github.com/user-attachments/assets/3f87466d-d40e-4dc5-9b30-e64355abf35f
 ---
 
 ## 🚀 Installation
-1. **Clone & Install**
+
+1. **Clone & install**
 
    ```bash
    git clone <repo-url>
-   cd readmoo-summary-extension
+   cd readmoo-summary
    npm install
    ```
 2. **Build**
@@ -71,26 +72,53 @@ https://github.com/user-attachments/assets/3f87466d-d40e-4dc5-9b30-e64355abf35f
 
 ## 🏗️ File Structure
 
+Source is organized by extension surface (feature-based). Each surface uses `index.js` / `index.css` / `index.html` as entry files; Webpack builds them into `dist/` with the names the extension expects.
+
 ```
-src/
- ├── manifest.json
- ├── background.js
- ├── popup.{html,css,js}
- ├── content.{js,css}
- ├── options.{html,css,js}
- └── icons/
+readmoo-summary/
+├── src/
+│   ├── background/
+│   │   └── index.js
+│   ├── popup/
+│   │   ├── index.js
+│   │   ├── index.html
+│   │   └── index.css
+│   ├── content/
+│   │   ├── index.js
+│   │   └── index.css
+│   ├── options/
+│   │   ├── index.js
+│   │   ├── index.html
+│   │   └── index.css
+│   ├── shared/
+│   │   └── styles/
+│   │       └── base.css      # Design tokens & shared CSS
+│   ├── icons/
+│   │   └── icon*.png
+│   └── manifest.json
+├── tests/
+│   ├── background.test.js
+│   ├── content.test.js
+│   ├── popup.test.js
+│   └── setup.js
+├── webpack.config.js
+└── package.json
 ```
+
+Build output: `dist/` (flat layout required by the extension runtime).
 
 ---
 
 ## ⚙️ Development
 
 ```bash
-npm run dev     # Watch mode
-npm run build   # Production build
-npm run test    # Run tests
-npm run lint    # Lint code
-npm run clean   # Clean build folder
+npm run dev          # Watch mode
+npm run build        # Production build
+npm run test         # Run tests
+npm run lint         # Lint code
+npm run lint:fix     # Lint and auto-fix
+npm run format       # Format code (Prettier)
+npm run clean        # Clean build folder
 ```
 
 ### Requirements

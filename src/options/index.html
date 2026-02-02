@@ -16,7 +16,7 @@
       <main class="options-main">
         <div class="settings-section">
           <h2>Summary Settings</h2>
-          
+
           <div class="setting-item">
             <label for="defaultLength">Default Summary Length:</label>
             <select id="defaultLength" class="setting-select">
@@ -29,7 +29,7 @@
           <div class="setting-item">
             <label for="autoClear">Auto-clear summary on popup open:</label>
             <div class="toggle-container">
-              <input type="checkbox" id="autoClear" class="toggle-input" checked>
+              <input type="checkbox" id="autoClear" class="toggle-input" checked />
               <label for="autoClear" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
@@ -39,7 +39,7 @@
           <div class="setting-item">
             <label for="showNotifications">Show notifications:</label>
             <div class="toggle-container">
-              <input type="checkbox" id="showNotifications" class="toggle-input" checked>
+              <input type="checkbox" id="showNotifications" class="toggle-input" checked />
               <label for="showNotifications" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
@@ -49,11 +49,20 @@
 
         <div class="settings-section">
           <h2>Content Settings</h2>
-          
+
           <div class="setting-item">
             <label for="minContentLength">Minimum content length:</label>
-            <input type="number" id="minContentLength" class="setting-input" value="100" min="50" max="1000">
-            <p class="setting-description">Minimum number of characters required for summarization</p>
+            <input
+              type="number"
+              id="minContentLength"
+              class="setting-input"
+              value="100"
+              min="50"
+              max="1000"
+            />
+            <p class="setting-description">
+              Minimum number of characters required for summarization
+            </p>
           </div>
         </div>
 
@@ -77,7 +86,9 @@
           <h2>About</h2>
           <div class="about-info">
             <p><strong>Version:</strong> 1.0.0</p>
-            <p><strong>Description:</strong> A Chrome extension for summarizing content from Readmoo</p>
+            <p>
+              <strong>Description:</strong> A Chrome extension for summarizing content from Readmoo
+            </p>
             <p><strong>Features:</strong></p>
             <ul>
               <li>Smart content extraction from Readmoo pages</li>

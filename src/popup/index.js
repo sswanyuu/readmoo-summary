@@ -48,8 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (error) {
         try {
           await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
-        } catch (fallbackError) {
-        }
+        } catch (fallbackError) {}
       }
     })
   }
@@ -103,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const response = await chrome.runtime.sendMessage({
         action: 'summarize',
-        summaryLength: summaryLengthSelect.value,
+        summaryLength: summaryLengthSelect.value
       })
 
       if (response && response.success) {
@@ -124,9 +123,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showSummary(summary) {
-      summaryContent.textContent = summary
-      summarySection.style.display = 'block'
-      summarySection.scrollIntoView({ behavior: 'smooth' })
+    summaryContent.textContent = summary
+    summarySection.style.display = 'block'
+    summarySection.scrollIntoView({ behavior: 'smooth' })
   }
 
   async function handleCopySummary() {
