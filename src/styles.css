@@ -1,10 +1,9 @@
 /* Global CSS Variables and Base Styles */
 :root {
   /* Colors */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --primary-color: #667eea;
-  --primary-dark: #5a67d8;
-  --secondary-color: #764ba2;
+  --primary-color: #6b7d6e;
+  --primary-dark: #5a6b5c;
+  --secondary-color: #7d8f7e;
 
   /* Text Colors */
   --text-primary: #1f2937;
@@ -132,7 +131,7 @@ body {
 }
 
 .btn-primary {
-  background: var(--primary-gradient);
+  background: var(--primary-color);
   color: white;
 }
 
